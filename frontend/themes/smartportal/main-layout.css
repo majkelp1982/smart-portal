@@ -14,3 +14,9 @@ vaadin-scroller[slot="drawer"] {
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
+
+.tile {
+  box-shadow: -2px -2px 10px 1px rgb(40,60,80);
+  background: radial-gradient(rgb(40,60,80), transparent)
+}
+

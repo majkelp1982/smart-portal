@@ -9,6 +9,7 @@ public class Tile extends HorizontalLayout {
   VerticalLayout detailsContainer;
 
   public Tile(final String imageSrc, final String title) {
+    this.addClassName("tile");
     final Image image = new Image(imageSrc, imageSrc);
     image.setHeight("50px");
     final Label titleLabel = new Label(title);

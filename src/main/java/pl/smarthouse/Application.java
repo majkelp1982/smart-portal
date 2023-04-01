@@ -1,6 +1,5 @@
 package pl.smarthouse;
 
-import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
@@ -14,7 +13,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * browsers.
  */
 @SpringBootApplication
-@NpmPackage(value = "@fontsource/oxygen", version = "4.5.0")
 @Theme(value = "smartportal", variant = Lumo.DARK)
 public class Application implements AppShellConfigurator {
 
