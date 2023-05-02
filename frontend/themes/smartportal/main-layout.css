@@ -16,7 +16,9 @@ vaadin-scroller[slot="drawer"] {
 }
 
 .tile {
-  box-shadow: -2px -2px 10px 1px rgb(40,60,80);
-  background: radial-gradient(rgb(40,60,80), transparent)
-}
+  background: rgb(26, 73, 115);
+  color: white;
+  border-radius: 8px;
+  box-shadow: 2px 2px 3px 1px rgb(60, 63, 65);
+  }
 

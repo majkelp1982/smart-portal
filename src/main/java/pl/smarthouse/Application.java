@@ -13,7 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * browsers.
  */
 @SpringBootApplication
-@Theme(value = "smartportal", variant = Lumo.DARK)
+@Theme(value = "smartportal", variant = Lumo.LIGHT)
 public class Application implements AppShellConfigurator {
 
   public static void main(String[] args) {
