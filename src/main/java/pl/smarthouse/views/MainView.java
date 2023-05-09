@@ -13,6 +13,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import pl.smarthouse.views.comfort.ComfortView;
+import pl.smarthouse.views.ventilation.VentilationView;
 
 @PageTitle("Main")
 @Route(value = "")
@@ -34,8 +35,10 @@ public class MainView extends AppLayout {
     final VerticalLayout drawer = new VerticalLayout();
     final RouterLink comfortViewLink =
         createDrawerElement("comfort.svg", "Comfort", ComfortView.class);
+    final RouterLink ventViewLink =
+        createDrawerElement("recu.svg", "Ventilation", VentilationView.class);
 
-    drawer.add(comfortViewLink);
+    drawer.add(comfortViewLink, ventViewLink);
     addToDrawer(drawer);
   }
 

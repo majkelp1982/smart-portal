@@ -8,7 +8,6 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.service.GuiService;
@@ -18,7 +17,6 @@ import pl.smarthouse.views.MainView;
 
 @PageTitle("Smart Portal | Comfort")
 @Route(value = "Comfort", layout = MainView.class)
-@Service
 public class ComfortView extends VerticalLayout {
   private final GuiService guiService;
   TabSheet tabs;
@@ -31,11 +29,10 @@ public class ComfortView extends VerticalLayout {
   @Override
   protected void onAttach(final AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    attachEvent.getUI().access(this::createView);
+    createView();
   }
 
   private void createView() {
-    this.getUI().get().setPollInterval(1000);
     tabs = new TabSheet();
     tabs.add("Overview", overviewTab());
     add(tabs);
