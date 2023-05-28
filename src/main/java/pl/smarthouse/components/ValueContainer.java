@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import pl.smarthouse.exceptions.ValueContainerException;
 
@@ -23,7 +24,10 @@ public class ValueContainer {
   public void updateValues() {
     valueContainer.forEach(
         (path, component) -> {
-          component.setValue((Number) getFieldValue(path));
+          final var value = getFieldValue(path);
+          if (Objects.nonNull(value)) {
+            component.setValue(value.toString());
+          }
         });
   }
 

@@ -6,5 +6,5 @@ import lombok.Getter;
 public abstract class PortalComponent {
   String valuePath;
 
-  public abstract void setValue(final Number value);
+  public abstract void setValue(final String value);
 }

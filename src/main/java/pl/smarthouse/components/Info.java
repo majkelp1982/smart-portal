@@ -38,7 +38,7 @@ public class Info extends PortalComponent {
   }
 
   @Override
-  public void setValue(final Number value) {
+  public void setValue(final String value) {
     final StringBuilder str = new StringBuilder();
     str.append(value);
     if (Objects.nonNull(unit)) {

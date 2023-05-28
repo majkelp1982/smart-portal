@@ -3,7 +3,6 @@ package pl.smarthouse.views.comfort;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
@@ -23,7 +22,7 @@ import pl.smarthouse.views.MainView;
 @Route(value = "Comfort", layout = MainView.class)
 public class ComfortView extends VerticalLayout {
   private final GuiService guiService;
-  private final HashMap<ZoneName, ValueContainer> valueContainerMap = new HashMap<>();
+  private final HashMap<String, ValueContainer> valueContainerMap = new HashMap<>();
   TabSheet tabs;
   HorizontalLayout overviewTab;
 
@@ -72,20 +71,16 @@ public class ComfortView extends VerticalLayout {
         ZoneName.valueOf(cutNameIfNecessaryAndReturn(moduleDto.getModuleName()));
 
     // Add zone to overview
-    overviewTab.add(createZoneOverview(zoneName, moduleDto));
+    overviewTab.add(createZoneOverview(zoneName.name(), zoneName.name(), moduleDto));
 
     // Create tab for zone
-    final VerticalLayout layout = new VerticalLayout();
-    final Label label = new Label("Zone: " + zoneName);
-    layout.add(label);
-
-    tabs.add(zoneName.name(), layout);
+    tabs.add(zoneName.name(), createZoneTab(zoneName.name(), moduleDto));
   }
 
-  private HorizontalLayout createZoneOverview(
-      final ZoneName zoneName, final ComfortModuleDto comfortDto) {
+  private Tile createZoneOverview(
+      final String zoneName, final String valueContainerName, final ComfortModuleDto comfortDto) {
 
-    final Tile tile = new Tile("room.svg", zoneName.name());
+    final Tile tile = new Tile("room.svg", zoneName);
     final Info temperature = new Info("temperatura", "°C");
     final Info humidity = new Info("wilgotność", "%");
     final Info currentOperation = new Info("operacja");
@@ -104,9 +99,33 @@ public class ComfortView extends VerticalLayout {
     valueContainer.put("currentOperation", currentOperation);
     valueContainer.put("requiredPower", requiredPower);
 
-    valueContainerMap.put(zoneName, valueContainer);
+    valueContainerMap.put(valueContainerName, valueContainer);
 
     return tile;
+  }
+
+  private VerticalLayout createZoneTab(final String zoneName, final ComfortModuleDto comfortDto) {
+    final VerticalLayout layout = new VerticalLayout();
+    final String zoneTabName = zoneName + "Tab";
+
+    final Tile overviewTile = createZoneOverview(zoneName, zoneTabName, comfortDto);
+
+    layout.add(enrichZoneOverviewWithDetails(zoneTabName, overviewTile));
+    return layout;
+  }
+
+  private HorizontalLayout enrichZoneOverviewWithDetails(
+      final String valueContainerName, final Tile zoneTabTile) {
+    final VerticalLayout detailsContainer = zoneTabTile.getDetailsContainer();
+
+    final Info leftHoldTimeInMinutes = new Info("podtrzymanie", "min");
+    detailsContainer.add(leftHoldTimeInMinutes.getLayout());
+
+    // Values
+    final ValueContainer valueContainer = valueContainerMap.get(valueContainerName);
+    valueContainer.put("leftHoldTimeInMinutes", leftHoldTimeInMinutes);
+
+    return zoneTabTile;
   }
 
   private String cutNameIfNecessaryAndReturn(final String fullComfortName) {

@@ -36,11 +36,11 @@ public class VentilationView extends VerticalLayout {
     add(label);
   }
 
-    @Override
-    protected void onAttach(final AttachEvent attachEvent) {
-      super.onAttach(attachEvent);
-      ui.setPollInterval(100);
-    }
+  @Override
+  protected void onAttach(final AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
+    ui.setPollInterval(100);
+  }
 
   @Override
   protected void onDetach(final DetachEvent detachEvent) {
