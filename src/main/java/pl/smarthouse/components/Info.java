@@ -7,14 +7,18 @@ import java.util.Objects;
 public class Info extends PortalComponent {
   private final HorizontalLayout layout = new HorizontalLayout();
   private final String name;
-  private final String unit;
-
   private final Label valueLabel = new Label();
+  private String unit;
   private boolean colorEnabled;
 
   public Info(final String name, final String unit) {
     this.name = name;
     this.unit = unit;
+    create();
+  }
+
+  public Info(final String name) {
+    this.name = name;
     create();
   }
 

@@ -88,12 +88,21 @@ public class ComfortView extends VerticalLayout {
     final Tile tile = new Tile("room.svg", zoneName.name());
     final Info temperature = new Info("temperatura", "°C");
     final Info humidity = new Info("wilgotność", "%");
-    tile.getDetailsContainer().add(temperature.getLayout(), humidity.getLayout());
+    final Info currentOperation = new Info("operacja");
+    final Info requiredPower = new Info("moc", "%");
+    tile.getDetailsContainer()
+        .add(
+            temperature.getLayout(),
+            humidity.getLayout(),
+            currentOperation.getLayout(),
+            requiredPower.getLayout());
 
     // Values
     final ValueContainer valueContainer = new ValueContainer(comfortDto);
-    valueContainer.put("sensor.temperature", temperature);
-    valueContainer.put("sensor.humidity", humidity);
+    valueContainer.put("sensorResponse.temperature", temperature);
+    valueContainer.put("sensorResponse.humidity", humidity);
+    valueContainer.put("currentOperation", currentOperation);
+    valueContainer.put("requiredPower", requiredPower);
 
     valueContainerMap.put(zoneName, valueContainer);
 
