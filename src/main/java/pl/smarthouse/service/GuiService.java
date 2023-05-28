@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.exceptions.GuiServiceException;
 import pl.smarthouse.properties.ModuleManagerProperties;
-import pl.smarthouse.sharedobjects.dao.ModuleDto;
+import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.SettingsDto;
 import pl.smarthouse.utils.GuiServiceUtils;
 

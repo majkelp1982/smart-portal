@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import lombok.experimental.UtilityClass;
 import pl.smarthouse.exceptions.GuiServiceException;
-import pl.smarthouse.sharedobjects.dao.ModuleDto;
+import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
 import pl.smarthouse.sharedobjects.dto.core.Bme280ResponseDto;
 import pl.smarthouse.sharedobjects.dto.core.Ds18b20ResultDto;
@@ -46,19 +46,25 @@ public class GuiServiceUtils {
   private void updateComfortModule(
       final ComfortModuleDto comfortDto, final ComfortModuleDto updateObject) {
 
-    comfortDto.getSensor().setTemperature(updateObject.getSensor().getTemperature());
-    comfortDto.getSensor().setPressure(updateObject.getSensor().getPressure());
-    comfortDto.getSensor().setHumidity(updateObject.getSensor().getHumidity());
-    comfortDto.getSensor().setError(updateObject.getSensor().isError());
-    comfortDto.getSensor().setResponseUpdate(updateObject.getSensor().getResponseUpdate());
+    comfortDto
+        .getSensorResponse()
+        .setTemperature(updateObject.getSensorResponse().getTemperature());
+    comfortDto.getSensorResponse().setPressure(updateObject.getSensorResponse().getPressure());
+    comfortDto.getSensorResponse().setHumidity(updateObject.getSensorResponse().getHumidity());
+    comfortDto.getSensorResponse().setError(updateObject.getSensorResponse().isError());
+    comfortDto
+        .getSensorResponse()
+        .setResponseUpdate(updateObject.getSensorResponse().getResponseUpdate());
 
-    comfortDto.setHeatingEnabled(updateObject.isHeatingEnabled());
+    comfortDto.setCurrentOperation(updateObject.getCurrentOperation());
+    comfortDto.setRequiredPower(updateObject.getRequiredPower());
+    comfortDto.setLeftHoldTimeInMinutes(updateObject.getLeftHoldTimeInMinutes());
 
     comfortDto.setUpdateTimestamp(LocalDateTime.now());
   }
 
   public ComfortModuleDto createBaseComfortDto() {
-    return ComfortModuleDto.builder().sensor(Bme280ResponseDto.builder().build()).build();
+    return ComfortModuleDto.builder().sensorResponse(Bme280ResponseDto.builder().build()).build();
   }
 
   public VentModuleDto createBaseVentDto() {

@@ -4,7 +4,8 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import java.util.Objects;
 
-public class Info extends HorizontalLayout {
+public class Info extends PortalComponent {
+  private final HorizontalLayout layout = new HorizontalLayout();
   private final String name;
   private final String unit;
 
@@ -24,10 +25,15 @@ public class Info extends HorizontalLayout {
     create();
   }
 
-  private void create() {
-    this.add(new Label(name), valueLabel);
+  public HorizontalLayout getLayout() {
+    return layout;
   }
 
+  private void create() {
+    layout.add(new Label(name), valueLabel);
+  }
+
+  @Override
   public void setValue(final Number value) {
     final StringBuilder str = new StringBuilder();
     str.append(value);
