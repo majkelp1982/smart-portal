@@ -119,11 +119,18 @@ public class ComfortView extends VerticalLayout {
     final VerticalLayout detailsContainer = zoneTabTile.getDetailsContainer();
 
     final Info leftHoldTimeInMinutes = new Info("podtrzymanie", "min");
-    detailsContainer.add(leftHoldTimeInMinutes.getLayout());
+    final Info sensorResponseUpdateTimestamp = new Info("update");
+    final Info sensorError = new Info("sensor error");
+    detailsContainer.add(
+        leftHoldTimeInMinutes.getLayout(),
+        sensorResponseUpdateTimestamp.getLayout(),
+        sensorError.getLayout());
 
     // Values
     final ValueContainer valueContainer = valueContainerMap.get(valueContainerName);
     valueContainer.put("leftHoldTimeInMinutes", leftHoldTimeInMinutes);
+    valueContainer.put("sensorResponse.!responseUpdate", sensorResponseUpdateTimestamp);
+    valueContainer.put("sensorResponse.error", sensorError);
 
     return zoneTabTile;
   }

@@ -36,7 +36,13 @@ public class ValueContainer {
     Object value = moduleDto;
     for (int i = 0; i < subFields.length; i++) {
       try {
-        final Field field = value.getClass().getDeclaredField(subFields[i]);
+        final Field field;
+        // If filed in super class
+        if (subFields[i].charAt(0) == '!') {
+          field = value.getClass().getSuperclass().getDeclaredField(subFields[i].substring(1));
+        } else {
+          field = value.getClass().getDeclaredField(subFields[i]);
+        }
         field.setAccessible(true); // Allow access to private fields if necessary
         value = field.get(value);
       } catch (final NoSuchFieldException | IllegalAccessException e) {
