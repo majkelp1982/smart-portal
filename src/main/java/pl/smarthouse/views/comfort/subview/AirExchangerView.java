@@ -33,7 +33,7 @@ public class AirExchangerView {
 
     final TimeRangesGrid weekendGrid =
         new TimeRangesGrid("Weekend time ranges", airExchanger.getWeekendTimeRanges());
-    workDayGrid.setItems(airExchanger.getWeekendTimeRanges());
+    weekendGrid.setItems(airExchanger.getWeekendTimeRanges());
 
     layout.add(enabledCheckBox, requiredPowerField, workDayGrid, weekendGrid);
     accordion.add("Air exchanger", layout);

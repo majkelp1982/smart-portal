@@ -34,15 +34,16 @@ public class ComfortView extends VerticalLayout {
   private final GuiService guiService;
   private final ComfortParamsService comfortParamsService;
   private final HashMap<String, ValueContainer> valueContainerMap = new HashMap<>();
+  private final Map<String, ComfortModuleParamsDto> comfortModuleParamsDto = new HashMap<>();
   TabSheet tabs;
   HorizontalLayout overviewTab;
-  private final Map<String, ComfortModuleParamsDto> comfortModuleParamsDto = new HashMap<>();
 
   public ComfortView(
       @Autowired final GuiService guiService,
       @Autowired final ComfortParamsService comfortParamsService) {
     this.guiService = guiService;
     this.comfortParamsService = comfortParamsService;
+    createView();
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
@@ -54,7 +55,7 @@ public class ComfortView extends VerticalLayout {
   @Override
   protected void onAttach(final AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    createView();
+
     UI.getCurrent().setPollInterval(1000);
   }
 
