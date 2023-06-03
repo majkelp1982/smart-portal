@@ -1,33 +1,48 @@
 package pl.smarthouse.views.comfort;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
+import pl.smarthouse.service.ComfortParamsService;
 import pl.smarthouse.service.GuiService;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
+import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleParamsDto;
+import pl.smarthouse.sharedobjects.dto.comfort.core.TemperatureControl;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.views.MainView;
+import pl.smarthouse.views.comfort.subview.AirExchangerView;
 
 @PageTitle("Smart Portal | Comfort")
 @Route(value = "Comfort", layout = MainView.class)
 public class ComfortView extends VerticalLayout {
   private final GuiService guiService;
+  private final ComfortParamsService comfortParamsService;
   private final HashMap<String, ValueContainer> valueContainerMap = new HashMap<>();
   TabSheet tabs;
   HorizontalLayout overviewTab;
+  private final Map<String, ComfortModuleParamsDto> comfortModuleParamsDto = new HashMap<>();
 
-  public ComfortView(@Autowired final GuiService guiService) {
+  public ComfortView(
+      @Autowired final GuiService guiService,
+      @Autowired final ComfortParamsService comfortParamsService) {
     this.guiService = guiService;
+    this.comfortParamsService = comfortParamsService;
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
@@ -110,8 +125,59 @@ public class ComfortView extends VerticalLayout {
 
     final Tile overviewTile = createZoneOverview(zoneName, zoneTabName, comfortDto);
 
-    layout.add(enrichZoneOverviewWithDetails(zoneTabName, overviewTile));
+    layout.add(
+        enrichZoneOverviewWithDetails(zoneTabName, overviewTile), createParamsView(comfortDto));
     return layout;
+  }
+
+  private VerticalLayout createParamsView(final ComfortModuleDto comfortDto) {
+    final VerticalLayout paramsLayout = new VerticalLayout();
+    comfortModuleParamsDto.put(
+        comfortDto.getServiceAddress(),
+        comfortParamsService.getParams(comfortDto.getServiceAddress()));
+    final Accordion accordion = new Accordion();
+    AirExchangerView.addForm(
+        accordion, comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getAirExchanger());
+    addTemperatureControlForm(
+        accordion,
+        comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getTemperatureControl());
+    addHumidityAlertForm(
+        accordion,
+        comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getTemperatureControl());
+
+    final Button saveButton = new Button("Save all");
+    saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+    saveButton.addClickListener(buttonClickEvent -> saveAction(comfortDto));
+
+    paramsLayout.add(accordion, saveButton);
+
+    return paramsLayout;
+  }
+
+  private void saveAction(final ComfortModuleDto comfortDto) {
+    try {
+      comfortParamsService.saveParams(
+          comfortDto.getServiceAddress(),
+          comfortModuleParamsDto.get(comfortDto.getServiceAddress()));
+    } catch (final JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void addTemperatureControlForm(
+      final Accordion accordion, final TemperatureControl temperatureControl) {
+    final VerticalLayout layout = new VerticalLayout();
+    layout.add(new Label("temperatureControlLabel"));
+
+    accordion.add("Temperature control", layout);
+  }
+
+  private void addHumidityAlertForm(
+      final Accordion accordion, final TemperatureControl temperatureControl) {
+    final VerticalLayout layout = new VerticalLayout();
+
+    layout.add();
+    accordion.add("Temperature control", layout);
   }
 
   private HorizontalLayout enrichZoneOverviewWithDetails(
