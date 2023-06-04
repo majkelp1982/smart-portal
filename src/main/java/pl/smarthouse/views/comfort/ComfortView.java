@@ -27,6 +27,7 @@ import pl.smarthouse.sharedobjects.dto.comfort.core.TemperatureControl;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.comfort.subview.AirExchangerView;
+import pl.smarthouse.views.comfort.subview.HumidityAlertView;
 
 @PageTitle("Smart Portal | Comfort")
 @Route(value = "Comfort", layout = MainView.class)
@@ -142,9 +143,8 @@ public class ComfortView extends VerticalLayout {
     addTemperatureControlForm(
         accordion,
         comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getTemperatureControl());
-    addHumidityAlertForm(
-        accordion,
-        comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getTemperatureControl());
+    HumidityAlertView.addForm(
+        accordion, comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getHumidityAlert());
 
     final Button saveButton = new Button("Save all");
     saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

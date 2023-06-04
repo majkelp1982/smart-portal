@@ -7,7 +7,7 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import java.util.HashSet;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
-import pl.smarthouse.components.params.RequiredPowerField;
+import pl.smarthouse.components.params.PercentageField;
 import pl.smarthouse.components.params.TimeRangesGrid;
 import pl.smarthouse.sharedobjects.dto.comfort.core.AirExchanger;
 
@@ -22,7 +22,7 @@ public class AirExchangerView {
     enabledCheckBox.addValueChangeListener(
         event -> airExchanger.setEnabled(enabledCheckBox.getValue()));
 
-    final IntegerField requiredPowerField = new RequiredPowerField();
+    final IntegerField requiredPowerField = new PercentageField("required power");
     requiredPowerField.setValue(airExchanger.getRequiredPower());
     requiredPowerField.addValueChangeListener(
         event -> airExchanger.setRequiredPower(requiredPowerField.getValue()));
