@@ -31,7 +31,7 @@ public class HumidityAlertView {
         event -> humidityAlert.setRequiredPower(requiredPowerField.getValue()));
 
     final IntegerField requiredTurboPowerField = new PercentageField("required turbo power");
-    requiredTurboPowerField.setValue(humidityAlert.getRequiredPower());
+    requiredTurboPowerField.setValue(humidityAlert.getRequiredTurboPower());
     requiredTurboPowerField.addValueChangeListener(
         event -> humidityAlert.setRequiredTurboPower(requiredTurboPowerField.getValue()));
 
