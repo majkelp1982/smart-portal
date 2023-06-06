@@ -7,7 +7,6 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
@@ -23,11 +22,11 @@ import pl.smarthouse.service.ComfortParamsService;
 import pl.smarthouse.service.GuiService;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleParamsDto;
-import pl.smarthouse.sharedobjects.dto.comfort.core.TemperatureControl;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.comfort.subview.AirExchangerView;
 import pl.smarthouse.views.comfort.subview.HumidityAlertView;
+import pl.smarthouse.views.comfort.subview.TemperatureControlView;
 
 @PageTitle("Smart Portal | Comfort")
 @Route(value = "Comfort", layout = MainView.class)
@@ -98,10 +97,10 @@ public class ComfortView extends VerticalLayout {
       final String zoneName, final String valueContainerName, final ComfortModuleDto comfortDto) {
 
     final Tile tile = new Tile("room.svg", zoneName);
-    final Info temperature = new Info("temperatura", "°C");
-    final Info humidity = new Info("wilgotność", "%");
-    final Info currentOperation = new Info("operacja");
-    final Info requiredPower = new Info("moc", "%");
+    final Info temperature = new Info("temperature", "°C");
+    final Info humidity = new Info("humidity", "%");
+    final Info currentOperation = new Info("operation");
+    final Info requiredPower = new Info("power", "%");
     tile.getDetailsContainer()
         .add(
             temperature.getLayout(),
@@ -140,7 +139,7 @@ public class ComfortView extends VerticalLayout {
     final Accordion accordion = new Accordion();
     AirExchangerView.addForm(
         accordion, comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getAirExchanger());
-    addTemperatureControlForm(
+    TemperatureControlView.addForm(
         accordion,
         comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getTemperatureControl());
     HumidityAlertView.addForm(
@@ -150,6 +149,7 @@ public class ComfortView extends VerticalLayout {
     saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     saveButton.addClickListener(buttonClickEvent -> saveAction(comfortDto));
 
+    accordion.close();
     paramsLayout.add(accordion, saveButton);
 
     return paramsLayout;
@@ -165,27 +165,11 @@ public class ComfortView extends VerticalLayout {
     }
   }
 
-  private void addTemperatureControlForm(
-      final Accordion accordion, final TemperatureControl temperatureControl) {
-    final VerticalLayout layout = new VerticalLayout();
-    layout.add(new Label("temperatureControlLabel"));
-
-    accordion.add("Temperature control", layout);
-  }
-
-  private void addHumidityAlertForm(
-      final Accordion accordion, final TemperatureControl temperatureControl) {
-    final VerticalLayout layout = new VerticalLayout();
-
-    layout.add();
-    accordion.add("Temperature control", layout);
-  }
-
   private HorizontalLayout enrichZoneOverviewWithDetails(
       final String valueContainerName, final Tile zoneTabTile) {
     final VerticalLayout detailsContainer = zoneTabTile.getDetailsContainer();
 
-    final Info leftHoldTimeInMinutes = new Info("podtrzymanie", "min");
+    final Info leftHoldTimeInMinutes = new Info("extra hold", "min");
     final Info sensorResponseUpdateTimestamp = new Info("update");
     final Info sensorError = new Info("sensor error");
     detailsContainer.add(

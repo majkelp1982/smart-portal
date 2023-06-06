@@ -1,6 +1,9 @@
 package pl.smarthouse.components;
 
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +29,14 @@ public class ValueContainer {
         (path, component) -> {
           final var value = getFieldValue(path);
           if (Objects.nonNull(value)) {
-            component.setValue(value.toString());
+            if (value instanceof LocalDateTime) {
+              component.setValue(
+                  ((LocalDateTime) value)
+                      .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
+                      .toString());
+            } else {
+              component.setValue(value.toString());
+            }
           }
         });
   }

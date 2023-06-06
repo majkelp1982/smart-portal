@@ -48,6 +48,8 @@ public class TimeRangesGrid extends VerticalLayout {
     grid.addColumn(TimeRange::getFrom).setHeader("od").setAutoWidth(true).setFlexGrow(0);
     grid.addColumn(TimeRange::getTo).setHeader("do").setAutoWidth(true).setFlexGrow(0);
 
+    setItems(timeRanges);
+
     add(label, grid, buttonLayout);
   }
 
@@ -96,16 +98,19 @@ public class TimeRangesGrid extends VerticalLayout {
 
     // Form formLayout
     final HorizontalLayout formLayout = new HorizontalLayout();
+    final TimePicker timePickerTo = new TimePicker();
+    timePickerTo.setLabel("To");
+    timePickerTo.setStep(Duration.ofMinutes(15));
+    timePickerTo.setValue(LocalTime.of(LocalTime.now().getHour(), 15));
+
     final TimePicker timePickerFrom = new TimePicker();
     timePickerFrom.setLocale(Locale.ITALIAN);
     timePickerFrom.setLabel("From");
     timePickerFrom.setStep(Duration.ofMinutes(15));
-    timePickerFrom.setValue(LocalTime.of(7, 0));
+    timePickerFrom.setValue(LocalTime.of(LocalTime.now().getHour(), 0));
+    timePickerFrom.addValueChangeListener(
+        event -> timePickerTo.setValue(timePickerFrom.getValue().plusMinutes(15)));
 
-    final TimePicker timePickerTo = new TimePicker();
-    timePickerTo.setLabel("To");
-    timePickerTo.setStep(Duration.ofMinutes(15));
-    timePickerTo.setValue(LocalTime.of(7, 10));
     formLayout.add(timePickerFrom, timePickerTo);
     newTimeRangeDialog.add(formLayout);
 
