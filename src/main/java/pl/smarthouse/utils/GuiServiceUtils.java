@@ -32,7 +32,7 @@ public class GuiServiceUtils {
 
   public void updateData(final ModuleDto moduleDto, final ModuleDto updateObject) {
     if (moduleDto instanceof VentModuleDto) {
-      // TODO
+      updateVentModule((VentModuleDto) moduleDto, (VentModuleDto) updateObject);
 
     } else if (moduleDto instanceof ComfortModuleDto) {
       updateComfortModule((ComfortModuleDto) moduleDto, (ComfortModuleDto) updateObject);
@@ -41,6 +41,79 @@ public class GuiServiceUtils {
           String.format(
               "Exception on update data. Class not found for: %s", moduleDto.getClass().getName()));
     }
+  }
+
+  private void updateVentModule(final VentModuleDto ventDto, final VentModuleDto updateObject) {
+    ventDto.getZoneDtoHashMap().keySet().stream()
+        .forEach(
+            zoneName ->
+                updateVentZone(
+                    ventDto.getZoneDtoHashMap().get(zoneName),
+                    updateObject.getZoneDtoHashMap().get(zoneName)));
+
+    updateVentFan(ventDto.getFans().getInlet(), updateObject.getFans().getInlet());
+    updateVentFan(ventDto.getFans().getOutlet(), updateObject.getFans().getOutlet());
+
+    ventDto
+        .getIntakeThrottle()
+        .setCurrentPosition(updateObject.getIntakeThrottle().getCurrentPosition());
+    ventDto.getIntakeThrottle().setGoalPosition(updateObject.getIntakeThrottle().getGoalPosition());
+
+    updateBme280(ventDto.getAirExchanger().getInlet(), updateObject.getAirExchanger().getInlet());
+    updateBme280(ventDto.getAirExchanger().getOutlet(), updateObject.getAirExchanger().getOutlet());
+    updateBme280(
+        ventDto.getAirExchanger().getFreshAir(), updateObject.getAirExchanger().getFreshAir());
+    updateBme280(
+        ventDto.getAirExchanger().getUserAir(), updateObject.getAirExchanger().getUserAir());
+
+    updateDs18b20(
+        ventDto.getForcedAirSystemExchanger().getWatterIn(),
+        updateObject.getForcedAirSystemExchanger().getWatterIn());
+    updateDs18b20(
+        ventDto.getForcedAirSystemExchanger().getWatterOut(),
+        updateObject.getForcedAirSystemExchanger().getWatterOut());
+    updateDs18b20(
+        ventDto.getForcedAirSystemExchanger().getAirIn(),
+        updateObject.getForcedAirSystemExchanger().getAirIn());
+    updateDs18b20(
+        ventDto.getForcedAirSystemExchanger().getAirOut(),
+        updateObject.getForcedAirSystemExchanger().getAirOut());
+
+    ventDto.setCircuitPump(updateObject.getCircuitPump());
+    ventDto.setAirCondition(updateObject.getAirCondition());
+
+    ventDto.setUpdateTimestamp(LocalDateTime.now());
+  }
+
+  private void updateVentZone(final ZoneDto zoneDto, final ZoneDto updateZone) {
+    zoneDto.setLastUpdate(LocalDateTime.now());
+    zoneDto.setFunctionType(updateZone.getFunctionType());
+    zoneDto.setOperation(updateZone.getOperation());
+    zoneDto.getThrottle().setCurrentPosition(updateZone.getThrottle().getCurrentPosition());
+    zoneDto.getThrottle().setGoalPosition(updateZone.getThrottle().getGoalPosition());
+    zoneDto.setRequiredPower(updateZone.getRequiredPower());
+  }
+
+  private void updateBme280(
+      final Bme280ResponseDto bme280ResponseDto, final Bme280ResponseDto updateBme280) {
+    bme280ResponseDto.setTemperature(updateBme280.getTemperature());
+    bme280ResponseDto.setPressure(updateBme280.getPressure());
+    bme280ResponseDto.setHumidity(updateBme280.getHumidity());
+    bme280ResponseDto.setError(updateBme280.isError());
+    bme280ResponseDto.setResponseUpdate(updateBme280.getResponseUpdate());
+  }
+
+  private void updateDs18b20(final Ds18b20ResultDto sensor, final Ds18b20ResultDto updateSensor) {
+    sensor.setAddress(updateSensor.getAddress());
+    sensor.setTemp(updateSensor.getTemp());
+    sensor.setError(updateSensor.isError());
+    sensor.setLastUpdate(updateSensor.getLastUpdate());
+  }
+
+  private void updateVentFan(final FanDto fanDto, final FanDto updateFan) {
+    fanDto.setCurrentSpeed(updateFan.getCurrentSpeed());
+    fanDto.setGoalSpeed(updateFan.getGoalSpeed());
+    fanDto.setRevolution(updateFan.getRevolution());
   }
 
   private void updateComfortModule(
@@ -80,7 +153,10 @@ public class GuiServiceUtils {
   private HashMap<ZoneName, ZoneDto> zoneDtoHashMap() {
     final HashMap<ZoneName, ZoneDto> result = new HashMap<>();
     Arrays.stream(ZoneName.values())
-        .forEach(zoneName -> result.put(zoneName, ZoneDto.builder().build()));
+        .forEach(
+            zoneName ->
+                result.put(
+                    zoneName, ZoneDto.builder().throttle(ThrottleDto.builder().build()).build()));
     return result;
   }
 
