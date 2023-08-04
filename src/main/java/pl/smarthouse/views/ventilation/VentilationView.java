@@ -17,6 +17,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
+import pl.smarthouse.components.tiles.Bme280Tile;
+import pl.smarthouse.components.tiles.Ds18b20Tile;
 import pl.smarthouse.service.GuiService;
 import pl.smarthouse.service.ParamsService;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
@@ -68,7 +70,7 @@ public class VentilationView extends VerticalLayout {
     final HorizontalLayout fanAndActors = new HorizontalLayout();
     fanAndActors.add(createFanTile(), pumpAirConThrottle());
 
-    overviewTab.add(fanAndActors, airExchangerLayout());
+    overviewTab.add(fanAndActors, airExchangerLayout(), forcedAirLayout());
 
     tabs.add("overview", overviewTab);
   }
@@ -98,120 +100,23 @@ public class VentilationView extends VerticalLayout {
     final HorizontalLayout layout = new HorizontalLayout();
 
     layout.add(
-        exchangerInletTile(),
-        exchangerOutletTile(),
-        exchangerFreshAirTile(),
-        exchangerUsedAirTile());
+        Bme280Tile.getTile("Exchanger inlet", "airExchanger.inlet", valueContainer),
+        Bme280Tile.getTile("Exchanger outlet", "airExchanger.outlet", valueContainer),
+        Bme280Tile.getTile("Exchanger fresh-air", "airExchanger.freshAir", valueContainer),
+        Bme280Tile.getTile("Exchanger used-air", "airExchanger.userAir", valueContainer));
     return layout;
   }
 
-  private Tile exchangerInletTile() {
-    final Tile inletTile = new Tile("thermometer.svg", "Exchanger inlet");
+  private HorizontalLayout forcedAirLayout() {
+    final HorizontalLayout layout = new HorizontalLayout();
 
-    final Info inletTemperature = new Info("temperature", "°C");
-    final Info inletPressure = new Info("pressure", "hPa");
-    final Info inletHumidity = new Info("humidity", "%");
-    final Info inletError = new Info("error");
-    final Info inletUpdate = new Info("update");
-
-    inletTile
-        .getDetailsContainer()
-        .add(
-            inletTemperature.getLayout(),
-            inletPressure.getLayout(),
-            inletHumidity.getLayout(),
-            inletError.getLayout(),
-            inletUpdate.getLayout());
-
-    valueContainer.put("airExchanger.inlet.temperature", inletTemperature);
-    valueContainer.put("airExchanger.inlet.pressure", inletPressure);
-    valueContainer.put("airExchanger.inlet.humidity", inletHumidity);
-    valueContainer.put("airExchanger.inlet.error", inletError);
-    valueContainer.put("airExchanger.inlet.!responseUpdate", inletError);
-    return inletTile;
-  }
-
-  private Tile exchangerOutletTile() {
-    final Tile outletTile = new Tile("thermometer.svg", "Exchanger inlet");
-
-    final Info outletTemperature = new Info("temperature", "°C");
-    final Info outletPressure = new Info("pressure", "hPa");
-    final Info outletHumidity = new Info("humidity", "%");
-    final Info outletError = new Info("error");
-    final Info outletUpdate = new Info("update");
-
-    outletTile
-        .getDetailsContainer()
-        .add(
-            outletTemperature.getLayout(),
-            outletPressure.getLayout(),
-            outletHumidity.getLayout(),
-            outletError.getLayout(),
-            outletUpdate.getLayout());
-
-    valueContainer.put("airExchanger.outlet.temperature", outletTemperature);
-    valueContainer.put("airExchanger.outlet.pressure", outletPressure);
-    valueContainer.put("airExchanger.outlet.humidity", outletHumidity);
-    valueContainer.put("airExchanger.outlet.error", outletError);
-    valueContainer.put("airExchanger.outlet.!responseUpdate", outletError);
-    return outletTile;
-  }
-
-  private Tile exchangerFreshAirTile() {
-    final Tile freshAirTile = new Tile("thermometer.svg", "Exchanger fresh air");
-
-    final Info freshAirTemperature = new Info("temperature", "°C");
-    final Info freshAirPressure = new Info("pressure", "hPa");
-    final Info freshAirHumidity = new Info("humidity", "%");
-    final Info freshAirError = new Info("error");
-    final Info freshAirUpdate = new Info("update");
-
-    freshAirTile
-        .getDetailsContainer()
-        .add(
-            freshAirTemperature.getLayout(),
-            freshAirPressure.getLayout(),
-            freshAirHumidity.getLayout(),
-            freshAirError.getLayout(),
-            freshAirUpdate.getLayout());
-
-    valueContainer.put("airExchanger.freshAir.temperature", freshAirTemperature);
-    valueContainer.put("airExchanger.freshAir.pressure", freshAirPressure);
-    valueContainer.put("airExchanger.freshAir.humidity", freshAirHumidity);
-    valueContainer.put("airExchanger.freshAir.error", freshAirError);
-    valueContainer.put("airExchanger.freshAir.!responseUpdate", freshAirError);
-    return freshAirTile;
-  }
-
-  private Tile exchangerUsedAirTile() {
-    final Tile usedAirTile = new Tile("thermometer.svg", "Exchanger used air");
-
-    final Info usedAirTemperature = new Info("temperature", "°C");
-    final Info usedAirPressure = new Info("pressure", "hPa");
-    final Info usedAirHumidity = new Info("humidity", "%");
-    final Info usedAirError = new Info("error");
-    final Info usedAirUpdate = new Info("update");
-
-    usedAirTile
-        .getDetailsContainer()
-        .add(
-            usedAirTemperature.getLayout(),
-            usedAirPressure.getLayout(),
-            usedAirHumidity.getLayout(),
-            usedAirError.getLayout(),
-            usedAirUpdate.getLayout());
-
-    valueContainer.put("airExchanger.userAir.temperature", usedAirTemperature);
-    valueContainer.put("airExchanger.userAir.pressure", usedAirPressure);
-    valueContainer.put("airExchanger.userAir.humidity", usedAirHumidity);
-    valueContainer.put("airExchanger.userAir.error", usedAirError);
-    valueContainer.put("airExchanger.userAir.!responseUpdate", usedAirError);
-    return usedAirTile;
-  }
-
-  private Tile forcedAirTile() {
-    return null;
-    // TODO
+    layout.add(
+        Ds18b20Tile.getTile("Forced water-in", "forcedAirSystemExchanger.watterIn", valueContainer),
+        Ds18b20Tile.getTile(
+            "Forced water-out", "forcedAirSystemExchanger.watterOut", valueContainer),
+        Ds18b20Tile.getTile("Forced air-in", "forcedAirSystemExchanger.airIn", valueContainer),
+        Ds18b20Tile.getTile("Forced air-out", "forcedAirSystemExchanger.airOut", valueContainer));
+    return layout;
   }
 
   private Tile createFanTile() {

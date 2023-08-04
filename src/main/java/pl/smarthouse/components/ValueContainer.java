@@ -3,7 +3,6 @@ package pl.smarthouse.components;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -31,13 +30,14 @@ public class ValueContainer {
           final var value = getFieldValue(path);
           if (Objects.nonNull(value)) {
             if (value instanceof LocalDateTime) {
-              component.setValue(
+              final String strValue =
                   ((LocalDateTime) value)
-                      .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
-                      .toString());
-            }
-            if (path.contains("pressure")) {
-              final double roundOff = (double) Math.round((double) value * 100) / 100;
+                      .format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+                      .toString();
+              component.setValue(strValue);
+            } else if (path.contains("pressure") || path.contains("temp")) {
+              final double roundOff =
+                  (double) Math.round(Double.parseDouble(value.toString()) * 100) / 100;
               component.setValue(String.valueOf(roundOff));
             } else {
               component.setValue(value.toString());
