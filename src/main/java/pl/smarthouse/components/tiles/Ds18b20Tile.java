@@ -9,7 +9,7 @@ import pl.smarthouse.components.ValueContainer;
 public class Ds18b20Tile {
   public Tile getTile(final String name, final String path, final ValueContainer valueContainer) {
     final Tile tile = new Tile("thermometer.svg", name);
-    final Info temperature = new Info("T", "°C");
+    final Info temperature = new Info("temp", "°C");
     final Info error = new Info("error");
     final Info update = new Info("update");
 
