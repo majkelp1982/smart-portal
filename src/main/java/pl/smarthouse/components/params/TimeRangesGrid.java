@@ -18,15 +18,32 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.Data;
 import lombok.NonNull;
 import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRange;
 
+@Data
 public class TimeRangesGrid extends VerticalLayout {
   private final Set<TimeRange> timeRanges;
   private final Grid<TimeRange> grid = new Grid<>(TimeRange.class, false);
+  private boolean singleRange = false;
+  private boolean validationEnabled;
+
+  public TimeRangesGrid(
+      final String gridName, @NonNull final TimeRange timeRange, final boolean validationEnabled) {
+    this.timeRanges = Set.of(timeRange);
+    singleRange = true;
+    this.validationEnabled = validationEnabled;
+    init(gridName);
+  }
 
   public TimeRangesGrid(final String gridName, @NonNull final Set<TimeRange> timeRanges) {
     this.timeRanges = timeRanges;
+    singleRange = false;
+    init(gridName);
+  }
+
+  private void init(final String gridName) {
 
     final H5 label = new H5(gridName);
     final HorizontalLayout buttonLayout = new HorizontalLayout();
@@ -61,7 +78,7 @@ public class TimeRangesGrid extends VerticalLayout {
   }
 
   private void addButtonListener(final Dialog dialog, final TimePicker from, final TimePicker to) {
-    if (from.getValue().isAfter(to.getValue())) {
+    if (validationEnabled && from.getValue().isAfter(to.getValue())) {
       final Notification notification = new Notification();
       notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
       final Div text = new Div(new Text("Invalid time range"));
@@ -71,7 +88,19 @@ public class TimeRangesGrid extends VerticalLayout {
       notification.open();
       return;
     }
-    timeRanges.add(TimeRange.builder().from(from.getValue()).to(to.getValue()).build());
+    if (singleRange) {
+      timeRanges.stream()
+          .findFirst()
+          .map(
+              timeRange -> {
+                timeRange.setFrom(from.getValue());
+                timeRange.setTo(to.getValue());
+                return timeRange;
+              })
+          .orElseThrow();
+    } else {
+      timeRanges.add(TimeRange.builder().from(from.getValue()).to(to.getValue()).build());
+    }
     setItems(timeRanges);
     dialog.close();
   }
@@ -87,7 +116,16 @@ public class TimeRangesGrid extends VerticalLayout {
   }
 
   private void deleteListener() {
-    timeRanges.removeAll(grid.getSelectedItems());
+    if (singleRange) {
+      timeRanges.stream()
+          .forEach(
+              timeRange -> {
+                timeRange.setFrom(null);
+                timeRange.setTo(null);
+              });
+    } else {
+      timeRanges.removeAll(grid.getSelectedItems());
+    }
     grid.setItems(timeRanges);
   }
 
