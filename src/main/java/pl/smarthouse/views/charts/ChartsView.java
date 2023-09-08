@@ -7,6 +7,7 @@ import com.github.appreciated.apexcharts.config.chart.Type;
 import com.github.appreciated.apexcharts.config.chart.builder.ZoomBuilder;
 import com.github.appreciated.apexcharts.config.grid.builder.RowBuilder;
 import com.github.appreciated.apexcharts.config.stroke.Curve;
+import com.github.appreciated.apexcharts.config.tooltip.builder.XBuilder;
 import com.github.appreciated.apexcharts.config.xaxis.XAxisType;
 import com.github.appreciated.apexcharts.helper.Coordinate;
 import com.github.appreciated.apexcharts.helper.Series;
@@ -67,10 +68,10 @@ public class ChartsView extends VerticalLayout {
         });
 
     add(apexCharts, manageButton);
+    apexCharts.updateSeries(new Series<>());
   }
 
   private void createDialog() {
-    final VerticalLayout layout = new VerticalLayout();
     multiSelectListsMap =
         chartService.prepareMultiSelectListBox(
             chartService.getFieldsMap(), multiSelectListMapListener);
@@ -107,6 +108,14 @@ public class ChartsView extends VerticalLayout {
                 .withType(XAxisType.DATETIME)
                 .withTooltip(TooltipBuilder.get().withEnabled(false).build())
                 .build())
+        .withTooltip(
+            TooltipBuilder.get()
+                .withEnabled(true)
+                .withX(XBuilder.get().withFormat("dd/MM HH:mm:ss").withShow(true).build())
+                .withShared(false)
+                .withFillSeriesColor(false)
+                .withFollowCursor(true)
+                .build())
         .build();
   }
 
@@ -129,7 +138,7 @@ public class ChartsView extends VerticalLayout {
                                 .getCoordinates(
                                     moduleName,
                                     item,
-                                    LocalDateTime.now().minusHours(2),
+                                    LocalDateTime.now().minusDays(1),
                                     LocalDateTime.now())
                                 .collectList()
                                 .map(
