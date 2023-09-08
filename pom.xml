@@ -92,6 +92,11 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.github.appreciated</groupId>
+            <artifactId>apexcharts</artifactId>
+            <version>23.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -144,6 +149,18 @@
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>flow-server</artifactId>
+                        <version>${vaadin.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>flow-push</artifactId>
+                        <version>${vaadin.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

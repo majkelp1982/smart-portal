@@ -1,8 +1,6 @@
 {
  "packageJsonDependencies": {
-  "@fontsource/oxygen": "4.5.0",
   "@polymer/polymer": "3.5.1",
-  "@vaadin-component-factory/vcf-nav": "1.0.6",
   "@vaadin/accordion": "24.0.2",
   "@vaadin/app-layout": "24.0.2",
   "@vaadin/avatar": "24.0.2",
@@ -71,15 +69,16 @@
   "@vaadin/vaadin-usage-statistics": "2.1.2",
   "@vaadin/vertical-layout": "24.0.2",
   "@vaadin/virtual-list": "24.0.2",
+  "apexcharts": "3.35.0",
   "construct-style-sheets-polyfill": "3.1.0",
   "date-fns": "2.29.3",
   "lit": "2.6.1",
+  "onecolor": "3.1.0",
   "proj4": "2.8.1"
  },
  "npmModules": {
   "@lit/reactive-element": "1.6.1",
   "@polymer/polymer": "3.5.1",
-  "@vaadin-component-factory/vcf-nav": "1.0.6",
   "@vaadin/accordion": "24.0.2",
   "@vaadin/app-layout": "24.0.2",
   "@vaadin/avatar": "24.0.2",
@@ -145,6 +144,8 @@
   "@vaadin/vaadin-usage-statistics": "2.1.2",
   "@vaadin/vertical-layout": "24.0.2",
   "@vaadin/virtual-list": "24.0.2",
+  "@webcomponents/shadycss": "1.11.1",
+  "apexcharts": "3.35.0",
   "construct-style-sheets-polyfill": "3.1.0",
   "cookieconsent": "3.1.1",
   "date-fns": "2.29.3",
@@ -153,6 +154,7 @@
   "lit-html": "2.7.0",
   "mgrs": "1.0.0",
   "ol": "6.13.0",
+  "onecolor": "3.1.0",
   "proj4": "2.8.1",
   "quickselect": "2.0.0",
   "rbush": "3.0.1",
@@ -160,10 +162,11 @@
   "wkt-parser": "1.3.2"
  },
  "bundleImports": [
+  "@vaadin/vaadin-themable-mixin",
+  "Frontend/generated/jar-resources/com/github/appreciated/apexcharts/apexcharts-wrapper-styles.css",
   "@vaadin/grid/theme/lumo/vaadin-grid.js",
   "@vaadin/tooltip/theme/lumo/vaadin-tooltip.js",
   "@vaadin/grid/theme/lumo/vaadin-grid-column.js",
-  "@vaadin-component-factory/vcf-nav",
   "@vaadin/accordion/theme/lumo/vaadin-accordion-panel.js",
   "@vaadin/accordion/theme/lumo/vaadin-accordion.js",
   "@vaadin/app-layout/theme/lumo/vaadin-app-layout.js",
@@ -236,6 +239,7 @@
   "@vaadin/vaadin-lumo-styles/vaadin-iconset.js",
   "@vaadin/vertical-layout/theme/lumo/vaadin-vertical-layout.js",
   "@vaadin/virtual-list/vaadin-virtual-list.js",
+  "Frontend/generated/jar-resources/com/github/appreciated/apexcharts/apexcharts-wrapper.ts",
   "Frontend/generated/jar-resources/comboBoxConnector.js",
   "Frontend/generated/jar-resources/contextMenuConnector.js",
   "Frontend/generated/jar-resources/contextMenuTargetConnector.js",
@@ -259,6 +263,8 @@
  ],
  "frontendHashes": {
   "themes/smartportal/components/vaadin-button.css": "fb360cc9c7c5892b8c5b186c0b057b22f61c20d55854706f4320938cd5dc0e01",
+  "com/github/appreciated/apexcharts/apexcharts-wrapper-styles.css": "d837b7f39ff5cac62b2e0d4a48bb9a2c9c073451ee5c96ca4ba9394e7f91a542",
+  "com/github/appreciated/apexcharts/apexcharts-wrapper.ts": "a7651281f94f4d2ec2eef5ce5dbe70985f2005212f4141f1ddcacefda799edff",
   "comboBoxConnector.js": "1d004c3dae9c76f8bcc68678abe1b8f7bdc8b456f5c9c4c7f190df8ed25d66cd",
   "contextMenuConnector.js": "25a200f8086461635ddd92316ebeb5a868294c8650a190efbae120edb1088f4f",
   "contextMenuTargetConnector.js": "870f67643988dd5618c247bd3c28d843f70aa026ee89f44c3c7556b5e70856af",
@@ -284,8 +290,8 @@
   "smartportal": "{\n  \"lumoImports\" : [ \"typography\", \"color\", \"spacing\", \"badge\", \"utility\" ]\n}"
  },
  "entryScripts": [
-  "VAADIN/build/indexhtml-99a43a74.js"
+  "VAADIN/build/indexhtml-86bfa8c4.js"
  ],
  "webComponents": [],
- "packageJsonHash": "052a5f1c7ee512ff73e4b6257e3d599a68462ce2c138acc00ea4686e9a882863"
+ "packageJsonHash": "676cc3f1a2b1d3ee272fa76e59fb1e1547af2ed7a3c467952d4d6ce7ac4228f7"
 }
