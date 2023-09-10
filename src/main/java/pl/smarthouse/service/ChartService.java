@@ -23,6 +23,9 @@ import reactor.core.publisher.Flux;
 public class ChartService {
 
   private static final List<String> EXCLUSION_LIST = List.of("_id", "Timestamp", "Update", "class");
+  private static final long CET_TIME_OFFSET_IN_SECONDS =
+      ZonedDateTime.now().getOffset().getTotalSeconds();
+  private static final int FIX_DATETIME_OFFSET_IN_HOURS = 2;
   private final GuiService guiService;
   private final ModuleRepository moduleRepository;
 
@@ -31,17 +34,21 @@ public class ChartService {
       final String fieldPath,
       final LocalDateTime fromTimestamp,
       final LocalDateTime toTimestamp) {
-    final long CETTimeOffsetInSeconds = ZonedDateTime.now().getOffset().getTotalSeconds();
     return moduleRepository
         .getValues(tableName, fieldPath, fromTimestamp, toTimestamp)
         .map(this::getJsonObjectFromString)
-        .map(
-            jsonNode ->
-                new Coordinate(
-                    OffsetDateTime.parse(jsonNode.get("saveTimestamp").get("$date").asText())
-                        .plusSeconds(CETTimeOffsetInSeconds)
-                        .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                    getValue(fieldPath, jsonNode)));
+        .map(jsonNode -> getCoordinate(jsonNode, fieldPath));
+  }
+
+  private Coordinate getCoordinate(final JsonNode jsonNode, final String fieldPath) {
+
+    final LocalDateTime time =
+        LocalDateTime.from(
+                OffsetDateTime.parse(jsonNode.get("saveTimestamp").get("$date").asText()))
+            .plusHours(FIX_DATETIME_OFFSET_IN_HOURS)
+            .plusSeconds(CET_TIME_OFFSET_IN_SECONDS);
+    final String timeString = time.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    return new Coordinate(timeString, getValue(fieldPath, jsonNode));
   }
 
   private Object getValue(final String fieldPath, final JsonNode jsonNode) {
