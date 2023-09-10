@@ -16,12 +16,17 @@ import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +39,10 @@ import reactor.core.publisher.Flux;
 public class ChartsView extends VerticalLayout {
   private final ChartService chartService;
   private final Dialog manageDialog = new Dialog();
-  ApexCharts apexCharts;
-  private HashMap<String, MultiSelectListBox> multiSelectListsMap = new HashMap<>();
-  Consumer<Set<String>> multiSelectListMapListener = values -> updateSeries();
+  private LocalDateTime chartToTimestamp = LocalDateTime.now();
+  private LocalDateTime chartFromTimestamp = chartToTimestamp.minusDays(1);
+  private ApexCharts apexCharts;
+  private final Consumer<Set<String>> multiSelectListMapListener = values -> updateSeries();
 
   public ChartsView(@Autowired final ChartService chartService) {
     this.chartService = chartService;
@@ -60,6 +66,8 @@ public class ChartsView extends VerticalLayout {
     apexCharts.setWidth("2000px");
     apexCharts.setHeight("1000px");
 
+    final HorizontalLayout bottomLayout = new HorizontalLayout();
+
     final Button manageButton = new Button("Manage charts");
     manageButton.addClickListener(
         buttonClickEvent -> {
@@ -67,15 +75,38 @@ public class ChartsView extends VerticalLayout {
           manageDialog.open();
         });
 
-    add(apexCharts, manageButton);
+    final DatePicker.DatePickerI18n singleFormatI18n = new DatePicker.DatePickerI18n();
+    singleFormatI18n.setDateFormat("yyyy-MM-dd");
+    final DatePicker datePickerFromTimestamp = new DatePicker("Show charts until:");
+    datePickerFromTimestamp.setI18n(singleFormatI18n);
+    datePickerFromTimestamp.setValue(LocalDate.now());
+    datePickerFromTimestamp.setMax(LocalDate.now());
+    datePickerFromTimestamp.addValueChangeListener(
+        event -> {
+          chartToTimestamp = event.getValue().atTime(LocalTime.now());
+          updateSeries();
+        });
+
+    final IntegerField integerFieldMinusDays = new IntegerField("- days");
+    integerFieldMinusDays.setMin(1);
+    integerFieldMinusDays.setMax(5);
+    integerFieldMinusDays.setStep(1);
+    integerFieldMinusDays.setValue(1);
+    integerFieldMinusDays.addValueChangeListener(
+        event -> {
+          chartFromTimestamp = chartToTimestamp.minusDays(event.getValue());
+          updateSeries();
+        });
+
+    bottomLayout.add(manageButton, integerFieldMinusDays, datePickerFromTimestamp);
+
+    add(apexCharts, bottomLayout);
     apexCharts.updateSeries(new Series<>());
   }
 
   private void createDialog() {
-    multiSelectListsMap =
-        chartService.prepareMultiSelectListBox(
-            chartService.getFieldsMap(), multiSelectListMapListener);
-    final Accordion accordion = createAccordion(multiSelectListsMap);
+    chartService.prepareMultiSelectListBox(chartService.getFieldsMap(), multiSelectListMapListener);
+    final Accordion accordion = createAccordion(chartService.getMultiSelectListsMap());
 
     manageDialog.setMinWidth("300px");
     manageDialog.removeAll();
@@ -120,26 +151,15 @@ public class ChartsView extends VerticalLayout {
   }
 
   private void updateSeries() {
-    final HashMap<String, Set<String>> selectedItemsMap = new HashMap<>();
-    multiSelectListsMap.keySet().stream()
-        .filter(moduleName -> !multiSelectListsMap.get(moduleName).getSelectedItems().isEmpty())
-        .forEach(
-            moduleName ->
-                selectedItemsMap.put(
-                    moduleName, multiSelectListsMap.get(moduleName).getSelectedItems()));
-
-    Flux.fromIterable(selectedItemsMap.keySet())
+    Flux.fromIterable(chartService.getSelectedItems().keySet())
         .flatMap(
             moduleName ->
-                Flux.fromIterable(selectedItemsMap.get(moduleName))
+                Flux.fromIterable(chartService.getSelectedItems().get(moduleName))
                     .flatMap(
                         item ->
                             chartService
                                 .getCoordinates(
-                                    moduleName,
-                                    item,
-                                    LocalDateTime.now().minusDays(1),
-                                    LocalDateTime.now())
+                                    moduleName, item, chartFromTimestamp, chartToTimestamp)
                                 .collectList()
                                 .map(
                                     coordinates -> {

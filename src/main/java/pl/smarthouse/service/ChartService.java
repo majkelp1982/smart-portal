@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Consumer;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Flux;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Getter
 public class ChartService {
 
   private static final List<String> EXCLUSION_LIST = List.of("_id", "Timestamp", "Update", "class");
@@ -28,6 +30,7 @@ public class ChartService {
   private static final int FIX_DATETIME_OFFSET_IN_HOURS = 2;
   private final GuiService guiService;
   private final ModuleRepository moduleRepository;
+  private final HashMap<String, MultiSelectListBox> multiSelectListsMap = new HashMap<>();
 
   public Flux<Coordinate> getCoordinates(
       final String tableName,
@@ -38,6 +41,24 @@ public class ChartService {
         .getValues(tableName, fieldPath, fromTimestamp, toTimestamp)
         .map(this::getJsonObjectFromString)
         .map(jsonNode -> getCoordinate(jsonNode, fieldPath));
+  }
+
+  public HashMap<String, MultiSelectListBox> getMultiSelectListsMap() {
+    if (multiSelectListsMap.isEmpty()) {
+      throw new RuntimeException("The list is empty. First need do be prepared by ChartService");
+    }
+    return multiSelectListsMap;
+  }
+
+  public HashMap<String, Set<String>> getSelectedItems() {
+    final HashMap<String, Set<String>> selectedItemsMap = new HashMap<>();
+    multiSelectListsMap.keySet().stream()
+        .filter(moduleName -> !multiSelectListsMap.get(moduleName).getSelectedItems().isEmpty())
+        .forEach(
+            moduleName ->
+                selectedItemsMap.put(
+                    moduleName, multiSelectListsMap.get(moduleName).getSelectedItems()));
+    return selectedItemsMap;
   }
 
   private Coordinate getCoordinate(final JsonNode jsonNode, final String fieldPath) {
@@ -111,14 +132,13 @@ public class ChartService {
     }
   }
 
-  public HashMap<String, MultiSelectListBox> prepareMultiSelectListBox(
+  public void prepareMultiSelectListBox(
       final Map<String, List<String>> fieldsMap,
       final Consumer<Set<String>> selectionChangeListener) {
-    final HashMap<String, MultiSelectListBox> result = new HashMap<>();
     fieldsMap.forEach(
         (moduleName, values) ->
-            result.put(moduleName, getMultiSelectListBox(values, selectionChangeListener)));
-    return result;
+            multiSelectListsMap.put(
+                moduleName, getMultiSelectListBox(values, selectionChangeListener)));
   }
 
   private MultiSelectListBox<String> getMultiSelectListBox(

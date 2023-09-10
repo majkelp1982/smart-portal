@@ -256,8 +256,6 @@
     "@polymer/polymer": "$@polymer/polymer",
     "@vaadin/vaadin-themable-mixin": "$@vaadin/vaadin-themable-mixin",
     "date-fns": "$date-fns",
-    "apexcharts": "$apexcharts",
-    "onecolor": "$onecolor",
     "@vaadin/board": "$@vaadin/board",
     "@vaadin/charts": "$@vaadin/charts",
     "@vaadin/cookie-consent": "$@vaadin/cookie-consent",
@@ -265,6 +263,8 @@
     "@vaadin/grid-pro": "$@vaadin/grid-pro",
     "@vaadin/map": "$@vaadin/map",
     "@vaadin/rich-text-editor": "$@vaadin/rich-text-editor",
-    "proj4": "$proj4"
+    "proj4": "$proj4",
+    "apexcharts": "$apexcharts",
+    "onecolor": "$onecolor"
   }
 }
