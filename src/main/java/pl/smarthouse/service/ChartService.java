@@ -28,6 +28,7 @@ public class ChartService {
   private static final long CET_TIME_OFFSET_IN_SECONDS =
       ZonedDateTime.now().getOffset().getTotalSeconds();
   private static final int FIX_DATETIME_OFFSET_IN_HOURS = 2;
+  final HashMap<String, Set<String>> selectedItemsMap = new HashMap<>();
   private final GuiService guiService;
   private final ModuleRepository moduleRepository;
   private final HashMap<String, MultiSelectListBox> multiSelectListsMap = new HashMap<>();
@@ -47,17 +48,22 @@ public class ChartService {
     if (multiSelectListsMap.isEmpty()) {
       throw new RuntimeException("The list is empty. First need do be prepared by ChartService");
     }
+    getSelectedItems(false).keySet().stream()
+        .forEach(
+            moduleName ->
+                multiSelectListsMap.get(moduleName).select(selectedItemsMap.get(moduleName)));
     return multiSelectListsMap;
   }
 
-  public HashMap<String, Set<String>> getSelectedItems() {
-    final HashMap<String, Set<String>> selectedItemsMap = new HashMap<>();
-    multiSelectListsMap.keySet().stream()
-        .filter(moduleName -> !multiSelectListsMap.get(moduleName).getSelectedItems().isEmpty())
-        .forEach(
-            moduleName ->
-                selectedItemsMap.put(
-                    moduleName, multiSelectListsMap.get(moduleName).getSelectedItems()));
+  public HashMap<String, Set<String>> getSelectedItems(final boolean forceRefresh) {
+    if (forceRefresh) {
+      multiSelectListsMap.keySet().stream()
+          .filter(moduleName -> !multiSelectListsMap.get(moduleName).getSelectedItems().isEmpty())
+          .forEach(
+              moduleName ->
+                  selectedItemsMap.put(
+                      moduleName, multiSelectListsMap.get(moduleName).getSelectedItems()));
+    }
     return selectedItemsMap;
   }
 

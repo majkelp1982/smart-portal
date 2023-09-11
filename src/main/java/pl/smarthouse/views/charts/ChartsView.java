@@ -87,10 +87,11 @@ public class ChartsView extends VerticalLayout {
           updateSeries();
         });
 
-    final IntegerField integerFieldMinusDays = new IntegerField("- days");
+    final IntegerField integerFieldMinusDays = new IntegerField("minus days");
     integerFieldMinusDays.setMin(1);
     integerFieldMinusDays.setMax(5);
     integerFieldMinusDays.setStep(1);
+    integerFieldMinusDays.setStepButtonsVisible(true);
     integerFieldMinusDays.setValue(1);
     integerFieldMinusDays.addValueChangeListener(
         event -> {
@@ -101,7 +102,8 @@ public class ChartsView extends VerticalLayout {
     bottomLayout.add(manageButton, integerFieldMinusDays, datePickerFromTimestamp);
 
     add(apexCharts, bottomLayout);
-    apexCharts.updateSeries(new Series<>());
+    apexCharts.updateSeries(new Series());
+    updateSeries();
   }
 
   private void createDialog() {
@@ -151,10 +153,10 @@ public class ChartsView extends VerticalLayout {
   }
 
   private void updateSeries() {
-    Flux.fromIterable(chartService.getSelectedItems().keySet())
+    Flux.fromIterable(chartService.getSelectedItems(true).keySet())
         .flatMap(
             moduleName ->
-                Flux.fromIterable(chartService.getSelectedItems().get(moduleName))
+                Flux.fromIterable(chartService.getSelectedItems(true).get(moduleName))
                     .flatMap(
                         item ->
                             chartService
