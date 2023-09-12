@@ -100,6 +100,7 @@ public class ChartsView extends VerticalLayout {
         });
 
     bottomLayout.add(manageButton, integerFieldMinusDays, datePickerFromTimestamp);
+    bottomLayout.setAlignItems(Alignment.BASELINE);
 
     add(apexCharts, bottomLayout);
     apexCharts.updateSeries(new Series());
@@ -183,6 +184,6 @@ public class ChartsView extends VerticalLayout {
   }
 
   private void setSeries(final Series[] series) {
-    getUI().ifPresentOrElse(ui -> ui.access(() -> apexCharts.updateSeries(series)), null);
+    getUI().ifPresent(ui -> ui.access(() -> apexCharts.updateSeries(series)));
   }
 }

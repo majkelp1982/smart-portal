@@ -79,13 +79,12 @@ public class ComfortView extends VerticalLayout {
         horizontalOverviewTile -> overviewTab.add(horizontalOverviewTile));
   }
 
-  private ComfortModuleDto createZoneTab(final ComfortModuleDto moduleDto) {
+  private void createZoneTab(final ComfortModuleDto moduleDto) {
 
     final ZoneName zoneName =
         ZoneName.valueOf(cutNameIfNecessaryAndReturn(moduleDto.getModuleName()));
 
     // Add zone to overview
-
     if (horizontalOverviewTiles.size() == 0) {
       horizontalOverviewTiles.add(new HorizontalLayout());
     }
@@ -98,8 +97,6 @@ public class ComfortView extends VerticalLayout {
 
     // Create tab for zone
     tabs.add(zoneName.name(), createZoneTab(zoneName.name(), moduleDto));
-
-    return moduleDto;
   }
 
   private Tile createZoneOverview(
