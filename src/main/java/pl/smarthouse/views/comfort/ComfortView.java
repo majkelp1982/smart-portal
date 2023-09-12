@@ -11,14 +11,14 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
 import pl.smarthouse.service.GuiService;
 import pl.smarthouse.service.ParamsService;
+import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleParamsDto;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
@@ -30,12 +30,13 @@ import pl.smarthouse.views.comfort.subview.TemperatureControlView;
 @PageTitle("Smart Portal | Comfort")
 @Route(value = "Comfort", layout = MainView.class)
 public class ComfortView extends VerticalLayout {
+  final List<HorizontalLayout> horizontalOverviewTiles = new ArrayList<>();
   private final GuiService guiService;
   private final ParamsService paramsService;
   private final HashMap<String, ValueContainer> valueContainerMap = new HashMap<>();
   private final Map<String, ComfortModuleParamsDto> comfortModuleParamsDto = new HashMap<>();
   TabSheet tabs;
-  HorizontalLayout overviewTab;
+  VerticalLayout overviewTab = new VerticalLayout();
 
   public ComfortView(
       @Autowired final GuiService guiService, @Autowired final ParamsService paramsService) {
@@ -65,30 +66,40 @@ public class ComfortView extends VerticalLayout {
 
   private void createView() {
     tabs = new TabSheet();
-    tabs.add("Overview", overviewTab());
+    tabs.add("Overview", overviewTab);
     add(tabs);
 
     guiService.getModuleDtos().stream()
         .filter(moduleDto -> moduleDto.getModuleName().contains("COMFORT"))
+        .sorted(Comparator.comparing(ModuleDto::getModuleName))
         .map(moduleDto -> (ComfortModuleDto) moduleDto)
-        .forEach(this::createZone);
+        .forEach(this::createZoneTab);
+
+    horizontalOverviewTiles.forEach(
+        horizontalOverviewTile -> overviewTab.add(horizontalOverviewTile));
   }
 
-  private HorizontalLayout overviewTab() {
-    overviewTab = new HorizontalLayout();
-    return overviewTab;
-  }
-
-  private void createZone(final ComfortModuleDto moduleDto) {
+  private ComfortModuleDto createZoneTab(final ComfortModuleDto moduleDto) {
 
     final ZoneName zoneName =
         ZoneName.valueOf(cutNameIfNecessaryAndReturn(moduleDto.getModuleName()));
 
     // Add zone to overview
-    overviewTab.add(createZoneOverview(zoneName.name(), zoneName.name(), moduleDto));
+
+    if (horizontalOverviewTiles.size() == 0) {
+      horizontalOverviewTiles.add(new HorizontalLayout());
+    }
+    HorizontalLayout layout = horizontalOverviewTiles.get(horizontalOverviewTiles.size() - 1);
+    if (layout.getComponentCount() == 3) {
+      layout = new HorizontalLayout();
+      horizontalOverviewTiles.add(layout);
+    }
+    layout.add(createZoneOverview(zoneName.name(), zoneName.name(), moduleDto));
 
     // Create tab for zone
     tabs.add(zoneName.name(), createZoneTab(zoneName.name(), moduleDto));
+
+    return moduleDto;
   }
 
   private Tile createZoneOverview(
