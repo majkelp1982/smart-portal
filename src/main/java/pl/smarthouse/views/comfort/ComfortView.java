@@ -21,6 +21,7 @@ import pl.smarthouse.service.ParamsService;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleParamsDto;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.comfort.subview.AirExchangerView;
@@ -65,6 +66,7 @@ public class ComfortView extends VerticalLayout {
   }
 
   private void createView() {
+    // TODO disable params base on comfort type (air supplier or air extract)
     tabs = new TabSheet();
     tabs.add("Overview", overviewTab);
     add(tabs);
@@ -145,11 +147,16 @@ public class ComfortView extends VerticalLayout {
     final Accordion accordion = new Accordion();
     AirExchangerView.addForm(
         accordion, comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getAirExchanger());
-    TemperatureControlView.addForm(
-        accordion,
-        comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getTemperatureControl());
-    HumidityAlertView.addForm(
-        accordion, comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getHumidityAlert());
+    final FunctionType functionType = comfortDto.getFunctionType();
+    if (functionType == null || FunctionType.AIR_SUPPLY.equals(functionType)) {
+      TemperatureControlView.addForm(
+          accordion,
+          comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getTemperatureControl());
+    }
+    if (functionType == null || FunctionType.AIR_EXTRACT.equals(functionType)) {
+      HumidityAlertView.addForm(
+          accordion, comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getHumidityAlert());
+    }
 
     final Button saveButton = new Button("Save all");
     saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
