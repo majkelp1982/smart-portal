@@ -119,6 +119,8 @@ public class GuiServiceUtils {
   private void updateComfortModule(
       final ComfortModuleDto comfortDto, final ComfortModuleDto updateObject) {
 
+    comfortDto.setFunctionType(updateObject.getFunctionType());
+
     comfortDto
         .getSensorResponse()
         .setTemperature(updateObject.getSensorResponse().getTemperature());

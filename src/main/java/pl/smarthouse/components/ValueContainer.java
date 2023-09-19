@@ -40,7 +40,7 @@ public class ValueContainer {
                   (double) Math.round(Double.parseDouble(value.toString()) * 100) / 100;
               component.setValue(String.valueOf(roundOff));
             } else {
-              component.setValue(value.toString());
+              component.setValue(value);
             }
           }
         });

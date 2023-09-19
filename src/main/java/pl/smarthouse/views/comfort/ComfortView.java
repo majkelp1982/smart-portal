@@ -66,7 +66,6 @@ public class ComfortView extends VerticalLayout {
   }
 
   private void createView() {
-    // TODO disable params base on comfort type (air supplier or air extract)
     tabs = new TabSheet();
     tabs.add("Overview", overviewTab);
     add(tabs);
@@ -95,10 +94,10 @@ public class ComfortView extends VerticalLayout {
       layout = new HorizontalLayout();
       horizontalOverviewTiles.add(layout);
     }
-    layout.add(createZoneOverview(zoneName.name(), zoneName.name(), moduleDto));
-
     // Create tab for zone
     tabs.add(zoneName.name(), createZoneTab(zoneName.name(), moduleDto));
+
+    layout.add(createZoneOverview(zoneName.name(), zoneName.name(), moduleDto));
   }
 
   private Tile createZoneOverview(
@@ -106,9 +105,17 @@ public class ComfortView extends VerticalLayout {
 
     final Tile tile = new Tile("room.svg", zoneName);
     final Info temperature = new Info("temperature", "°C");
+    temperature.setExpectedValue(
+        comfortModuleParamsDto
+            .get(comfortDto.getServiceAddress())
+            .getTemperatureControl()
+            .getRequiredTemperature());
+    ColorPredicates.assignToTemperature(temperature, -0.5, 0.2, 0.3);
     final Info humidity = new Info("humidity", "%");
     final Info currentOperation = new Info("operation");
+    ColorPredicates.assignToCurrentOperation(currentOperation);
     final Info requiredPower = new Info("power", "%");
+    ColorPredicates.assignToRequiredPower(requiredPower);
     tile.getDetailsContainer()
         .add(
             temperature.getLayout(),
@@ -130,12 +137,12 @@ public class ComfortView extends VerticalLayout {
 
   private VerticalLayout createZoneTab(final String zoneName, final ComfortModuleDto comfortDto) {
     final VerticalLayout layout = new VerticalLayout();
+    final VerticalLayout paramLayout = createParamsView(comfortDto);
     final String zoneTabName = zoneName + "Tab";
 
     final Tile overviewTile = createZoneOverview(zoneName, zoneTabName, comfortDto);
 
-    layout.add(
-        enrichZoneOverviewWithDetails(zoneTabName, overviewTile), createParamsView(comfortDto));
+    layout.add(enrichZoneOverviewWithDetails(zoneTabName, overviewTile), paramLayout);
     return layout;
   }
 

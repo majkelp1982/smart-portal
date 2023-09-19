@@ -19,7 +19,6 @@ import pl.smarthouse.views.ventilation.VentilationView;
 @PageTitle("Main")
 @Route(value = "")
 public class MainView extends AppLayout {
-  // TODO add colors to controls
   public MainView() {
     createHeader();
     createDrawer();

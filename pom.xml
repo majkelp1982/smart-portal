@@ -57,6 +57,14 @@
                     <groupId>com.vaadin</groupId>
                     <artifactId>vaadin-board-flow</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-charts-flow</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-cookie-consent-flow</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -91,6 +99,14 @@
                 <exclusion>
                     <groupId>com.vaadin</groupId>
                     <artifactId>vaadin-board-testbench</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-charts-testbench</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-cookie-consent-testbench</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
