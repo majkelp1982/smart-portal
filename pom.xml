@@ -65,6 +65,22 @@
                     <groupId>com.vaadin</groupId>
                     <artifactId>vaadin-cookie-consent-flow</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-crud-flow</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-grid-pro-flow</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-map-flow</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-rich-text-editor-flow</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -107,6 +123,22 @@
                 <exclusion>
                     <groupId>com.vaadin</groupId>
                     <artifactId>vaadin-cookie-consent-testbench</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-crud-testbench</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-grid-pro-testbench</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-map-testbench</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-rich-text-editor-testbench</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

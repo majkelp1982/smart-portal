@@ -75,8 +75,7 @@
     "construct-style-sheets-polyfill": "3.1.0",
     "date-fns": "2.29.3",
     "lit": "2.6.1",
-    "onecolor": "3.1.0",
-    "proj4": "2.8.1"
+    "onecolor": "3.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "5.0.2",
@@ -169,8 +168,7 @@
       "construct-style-sheets-polyfill": "3.1.0",
       "date-fns": "2.29.3",
       "lit": "2.6.1",
-      "onecolor": "3.1.0",
-      "proj4": "2.8.1"
+      "onecolor": "3.1.0"
     },
     "devDependencies": {
       "@rollup/plugin-replace": "5.0.2",
@@ -188,7 +186,7 @@
       "workbox-core": "6.5.4",
       "workbox-precaching": "6.5.4"
     },
-    "hash": "676cc3f1a2b1d3ee272fa76e59fb1e1547af2ed7a3c467952d4d6ce7ac4228f7"
+    "hash": "d1b980e59d99ccf3f8a90e4e71d530815dcd299b65b7846e5d4f0f263995aa5d"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -263,7 +261,6 @@
     "@vaadin/grid-pro": "$@vaadin/grid-pro",
     "@vaadin/map": "$@vaadin/map",
     "@vaadin/rich-text-editor": "$@vaadin/rich-text-editor",
-    "proj4": "$proj4",
     "apexcharts": "$apexcharts",
     "onecolor": "$onecolor"
   }

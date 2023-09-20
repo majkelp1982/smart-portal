@@ -25,7 +25,6 @@ import pl.smarthouse.views.ventilation.tabs.ZoneTab;
 @Route(value = "Ventilation", layout = MainView.class)
 @EnableScheduling
 public class VentilationView extends VerticalLayout {
-  private final GuiService guiService;
   private final ParamsService paramsService;
   private final ValueContainer valueContainer;
   private final VentModuleDto ventModuleDto;
@@ -34,7 +33,6 @@ public class VentilationView extends VerticalLayout {
   public VentilationView(
       @Autowired final GuiService guiService, @Autowired final ParamsService paramsService) {
 
-    this.guiService = guiService;
     this.paramsService = paramsService;
     ventModuleDto =
         (VentModuleDto)

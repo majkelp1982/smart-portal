@@ -12,6 +12,7 @@ import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
+import pl.smarthouse.views.utils.ColorPredicates;
 
 @RequiredArgsConstructor
 public class ZoneTab {
@@ -30,7 +31,7 @@ public class ZoneTab {
         .forEach(
             tile -> {
               horizontalTiles.get(horizontalTiles.size() - 1).add(tile);
-              if (i.addAndGet(1) == 3) {
+              if (i.addAndGet(1) == 2) {
                 horizontalTiles.add(new HorizontalLayout());
                 i.set(0);
               }
@@ -44,10 +45,15 @@ public class ZoneTab {
     final Tile zoneTile = new Tile("place.svg", zoneName.toString());
 
     final Info operation = new Info("operation");
+    ColorPredicates.assignToCurrentOperation(operation);
     final Info currentPosition = new Info("position");
+    ColorPredicates.assignToThrottleState(currentPosition);
     final Info goalPosition = new Info("goal");
+    ColorPredicates.assignToThrottleState(goalPosition);
     final Info requiredPower = new Info("power", "%");
+    ColorPredicates.assignNotZeroState(requiredPower);
     final Info lastUpdate = new Info("update");
+    ColorPredicates.assignToUpdateTimestamp(lastUpdate);
 
     valueContainer.put("zoneDtoHashMap[" + zoneName + "].operation", operation);
     valueContainer.put(

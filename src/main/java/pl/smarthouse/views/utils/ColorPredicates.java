@@ -1,27 +1,62 @@
-package pl.smarthouse.views.comfort;
+package pl.smarthouse.views.utils;
 
+import java.time.LocalTime;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.components.PortalComponent;
 import pl.smarthouse.model.ComponentColor;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.ThrottleState;
 import pl.smarthouse.sharedobjects.enums.Operation;
 
 @UtilityClass
 public class ColorPredicates {
 
+  public void assignOnOffState(final Info info) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OFF);
+    info.addColorPredicates(component -> State.ON.equals(component.getValue()), ComponentColor.ON);
+  }
+
+  public void assignNotZeroState(final Info info) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OFF);
+    info.addColorPredicates(
+        component -> Integer.valueOf(component.getValue().toString()) > 0, ComponentColor.ON);
+  }
+
   public void assignToCurrentOperation(final Info info) {
     info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OFF);
     info.addColorPredicates(
         component -> !Operation.STANDBY.equals(component.getValue()), ComponentColor.ON);
+  }
+
+  public void assignToThrottleState(final Info info) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OFF);
     info.addColorPredicates(
-        operation -> Operation.STANDBY.equals(operation.getValue()), ComponentColor.OFF);
+        component -> ThrottleState.OPEN.equals(component.getValue()), ComponentColor.ON);
   }
 
   public void assignToRequiredPower(final Info info) {
     info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OFF);
     info.addColorPredicates(component -> (int) component.getValue() > 0, ComponentColor.ON);
-    info.addColorPredicates(component -> (int) component.getValue() == 0, ComponentColor.OFF);
+  }
+
+  public void assignToHumidity(final Info info) {
+    info.setColorEnabled(true);
+    info.addColorPredicates(
+        component -> ((int) component.getValue() < 35 && (int) component.getValue() > 70),
+        ComponentColor.ALARM);
+    info.addColorPredicates(
+        component -> ((int) component.getValue() >= 35 && (int) component.getValue() <= 70),
+        ComponentColor.WARNING);
+    info.addColorPredicates(
+        component -> ((int) component.getValue() >= 40 && (int) component.getValue() <= 60),
+        ComponentColor.OK);
   }
 
   public void assignToTemperature(

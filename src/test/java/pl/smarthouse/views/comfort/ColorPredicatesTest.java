@@ -1,11 +1,10 @@
 package pl.smarthouse.views.comfort;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.model.ComponentColor;
+import pl.smarthouse.views.utils.ColorPredicates;
 
 class ColorPredicatesTest {
 

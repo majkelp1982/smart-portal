@@ -27,6 +27,7 @@ import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.comfort.subview.AirExchangerView;
 import pl.smarthouse.views.comfort.subview.HumidityAlertView;
 import pl.smarthouse.views.comfort.subview.TemperatureControlView;
+import pl.smarthouse.views.utils.ColorPredicates;
 
 @PageTitle("Smart Portal | Comfort")
 @Route(value = "Comfort", layout = MainView.class)
@@ -90,7 +91,7 @@ public class ComfortView extends VerticalLayout {
       horizontalOverviewTiles.add(new HorizontalLayout());
     }
     HorizontalLayout layout = horizontalOverviewTiles.get(horizontalOverviewTiles.size() - 1);
-    if (layout.getComponentCount() == 3) {
+    if (layout.getComponentCount() == 2) {
       layout = new HorizontalLayout();
       horizontalOverviewTiles.add(layout);
     }
@@ -112,6 +113,7 @@ public class ComfortView extends VerticalLayout {
             .getRequiredTemperature());
     ColorPredicates.assignToTemperature(temperature, -0.5, 0.2, 0.3);
     final Info humidity = new Info("humidity", "%");
+    ColorPredicates.assignToHumidity(humidity);
     final Info currentOperation = new Info("operation");
     ColorPredicates.assignToCurrentOperation(currentOperation);
     final Info requiredPower = new Info("power", "%");
@@ -189,7 +191,10 @@ public class ComfortView extends VerticalLayout {
 
     final Info leftHoldTimeInMinutes = new Info("extra hold", "min");
     final Info sensorResponseUpdateTimestamp = new Info("update");
+    ColorPredicates.assignToUpdateTimestamp(sensorResponseUpdateTimestamp);
+
     final Info sensorError = new Info("sensor error");
+    ColorPredicates.assignToError(sensorError);
     detailsContainer.add(
         leftHoldTimeInMinutes.getLayout(),
         sensorResponseUpdateTimestamp.getLayout(),

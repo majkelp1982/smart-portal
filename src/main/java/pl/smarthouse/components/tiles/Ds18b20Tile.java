@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
+import pl.smarthouse.views.utils.ColorPredicates;
 
 @UtilityClass
 public class Ds18b20Tile {
@@ -11,7 +12,9 @@ public class Ds18b20Tile {
     final Tile tile = new Tile("thermometer.svg", name);
     final Info temperature = new Info("temp", "°C");
     final Info error = new Info("error");
+    ColorPredicates.assignToError(error);
     final Info update = new Info("update");
+    ColorPredicates.assignToUpdateTimestamp(update);
 
     tile.getDetailsContainer().add(temperature.getLayout(), error.getLayout(), update.getLayout());
 

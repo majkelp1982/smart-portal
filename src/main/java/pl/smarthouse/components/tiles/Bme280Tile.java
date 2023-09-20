@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
+import pl.smarthouse.views.utils.ColorPredicates;
 
 @UtilityClass
 public class Bme280Tile {
@@ -15,7 +16,9 @@ public class Bme280Tile {
     final Info pressure = new Info("pressure", "hPa");
     final Info humidity = new Info("humidity", "%");
     final Info error = new Info("error");
+    ColorPredicates.assignToError(error);
     final Info update = new Info("update");
+    ColorPredicates.assignToUpdateTimestamp(update);
 
     tile.getDetailsContainer()
         .add(
