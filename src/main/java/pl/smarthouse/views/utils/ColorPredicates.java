@@ -116,6 +116,24 @@ public class ColorPredicates {
         ComponentColor.HOT);
   }
 
+  public void assignToUpdateTimestamp(final Info info) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.NORMAL);
+    info.addColorPredicates(
+        component -> {
+          final LocalTime updateTimestamp = LocalTime.parse(component.getValue().toString());
+          return (Objects.isNull(updateTimestamp)
+              || LocalTime.now().isAfter(updateTimestamp.plusMinutes(2)));
+        },
+        ComponentColor.ALARM);
+  }
+
+  public void assignToError(final Info info) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.NORMAL);
+    info.addColorPredicates(component -> (boolean) component.getValue(), ComponentColor.ALARM);
+  }
+
   private double delta(final Object value1, final Object value2) {
     if (Objects.isNull(value1) || Objects.isNull(value2)) {
       return 0;
