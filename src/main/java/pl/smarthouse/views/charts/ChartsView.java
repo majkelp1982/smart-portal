@@ -109,14 +109,21 @@ public class ChartsView extends VerticalLayout {
 
   private void createDialog() {
     chartService.prepareMultiSelectListBox(chartService.getFieldsMap(), multiSelectListMapListener);
+
+    final Button deselectAllButton = new Button("deselect all");
+    deselectAllButton.addClickListener(
+        buttonClickEvent -> {
+          chartService.deselectAllItems();
+        });
+
     final Accordion accordion = createAccordion(chartService.getMultiSelectListsMap());
 
     manageDialog.setMinWidth("300px");
     manageDialog.removeAll();
-    manageDialog.add(accordion);
+    manageDialog.add(deselectAllButton, accordion);
   }
 
-  private Accordion createAccordion(final HashMap<String, MultiSelectListBox> multiSelectListsMap) {
+  private Accordion createAccordion(final Map<String, MultiSelectListBox> multiSelectListsMap) {
     final Accordion accordion = new Accordion();
     multiSelectListsMap.keySet().stream()
         .sorted()
@@ -157,7 +164,7 @@ public class ChartsView extends VerticalLayout {
     Flux.fromIterable(chartService.getSelectedItems(true).keySet())
         .flatMap(
             moduleName ->
-                Flux.fromIterable(chartService.getSelectedItems(true).get(moduleName))
+                Flux.fromIterable(chartService.getSelectedItems(false).get(moduleName))
                     .flatMap(
                         item ->
                             chartService

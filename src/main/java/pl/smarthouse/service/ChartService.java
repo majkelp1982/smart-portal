@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +29,10 @@ public class ChartService {
   private static final long CET_TIME_OFFSET_IN_SECONDS =
       ZonedDateTime.now().getOffset().getTotalSeconds();
   private static final int FIX_DATETIME_OFFSET_IN_HOURS = 2;
-  final HashMap<String, Set<String>> selectedItemsMap = new HashMap<>();
+  final Map<String, Set<String>> selectedItemsMap = new ConcurrentHashMap<>();
   private final GuiService guiService;
   private final ModuleRepository moduleRepository;
-  private final HashMap<String, MultiSelectListBox> multiSelectListsMap = new HashMap<>();
+  private final Map<String, MultiSelectListBox> multiSelectListsMap = new ConcurrentHashMap<>();
 
   public Flux<Coordinate> getCoordinates(
       final String tableName,
@@ -44,19 +45,33 @@ public class ChartService {
         .map(jsonNode -> getCoordinate(jsonNode, fieldPath));
   }
 
-  public HashMap<String, MultiSelectListBox> getMultiSelectListsMap() {
+  public Map<String, MultiSelectListBox> getMultiSelectListsMap() {
     if (multiSelectListsMap.isEmpty()) {
       throw new RuntimeException("The list is empty. First need do be prepared by ChartService");
     }
-    getSelectedItems(false).keySet().stream()
-        .forEach(
-            moduleName ->
-                multiSelectListsMap.get(moduleName).select(selectedItemsMap.get(moduleName)));
+    final Map<String, Set<String>> selectedItemsMapCopy = new HashMap<>();
+    getSelectedItems(false)
+        .forEach((moduleName, itemSet) -> selectedItemsMapCopy.put(moduleName, itemSet));
+
+    selectedItemsMapCopy.forEach(
+        (moduleName, itemSet) -> {
+          log.info(
+              "Module name: {}, selected items found: {}",
+              moduleName,
+              selectedItemsMapCopy.get(moduleName));
+          multiSelectListsMap.get(moduleName).select(itemSet);
+        });
     return multiSelectListsMap;
   }
 
-  public HashMap<String, Set<String>> getSelectedItems(final boolean forceRefresh) {
+  public void deselectAllItems() {
+    multiSelectListsMap.values().stream()
+        .forEach(multiSelectListBox -> multiSelectListBox.deselectAll());
+  }
+
+  public Map<String, Set<String>> getSelectedItems(final boolean forceRefresh) {
     if (forceRefresh) {
+      selectedItemsMap.clear();
       multiSelectListsMap.keySet().stream()
           .filter(moduleName -> !multiSelectListsMap.get(moduleName).getSelectedItems().isEmpty())
           .forEach(
