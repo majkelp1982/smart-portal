@@ -3,6 +3,10 @@ package pl.smarthouse.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.appreciated.apexcharts.helper.Coordinate;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import java.time.LocalDateTime;
@@ -99,6 +103,91 @@ public class ChartService {
       nestedNode = nestedNode.get(splitPath);
     }
     return nestedNode;
+  }
+
+  public List<Coordinate> handleNotANumberValues(final List<Coordinate> coordinates) {
+    if (!(coordinates.get(0).getY()[0] instanceof IntNode)
+        && !(coordinates.get(0).getY()[0] instanceof DoubleNode)) {
+      final List<Coordinate> results = new ArrayList<>();
+      final Coordinate lastCoordinate = coordinates.get(0);
+      results.add(new Coordinate(lastCoordinate.getX(), recalculate((lastCoordinate.getY()[0]))));
+      coordinates.forEach(
+          coordinate -> {
+            if (coordinate.getY()[0] != lastCoordinate.getY()[0]) {
+              results.add(
+                  new Coordinate(
+                      LocalDateTime.parse(coordinate.getX().toString())
+                          .minusNanos(1)
+                          .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                      recalculate((lastCoordinate.getY()[0]))));
+            }
+            lastCoordinate.setX(coordinate.getX());
+            lastCoordinate.setY(coordinate.getY());
+            results.add(new Coordinate(coordinate.getX(), recalculate(coordinate.getY()[0])));
+          });
+      return results;
+    }
+
+    // if not NaN y-values not change and return input
+    return coordinates;
+  }
+
+  private IntNode recalculate(final Object node) {
+    if (node instanceof BooleanNode) {
+      return recalculateBoolean((BooleanNode) node);
+    }
+
+    if (node instanceof TextNode) {
+      return recalculateText((TextNode) node);
+    }
+
+    throw new IllegalArgumentException(
+        String.format("recalculate of node: %s, not implemented", node.getClass()));
+  }
+
+  private IntNode recalculateText(final TextNode textNode) {
+    final String value = textNode.asText();
+    value.replace("\"", "");
+    switch (value) {
+      case "OFF" -> {
+        return IntNode.valueOf(0);
+      }
+
+      case "ON", "STANDBY" -> {
+        return IntNode.valueOf(1);
+      }
+      case "HUMIDITY_ALERT" -> {
+        return IntNode.valueOf(2);
+      }
+      case "AIR_EXCHANGE" -> {
+        return IntNode.valueOf(3);
+      }
+      case "AIR_HEATING" -> {
+        return IntNode.valueOf(4);
+      }
+      case "AIR_COOLING" -> {
+        return IntNode.valueOf(5);
+      }
+      case "AIR_CONDITION" -> {
+        return IntNode.valueOf(6);
+      }
+      case "FLOOR_HEATING" -> {
+        return IntNode.valueOf(7);
+      }
+    }
+
+    throw new IllegalArgumentException(
+        String.format("Recalculation text: %s, not implemented", value));
+  }
+
+  private IntNode recalculateBoolean(final BooleanNode booleanNode) {
+    // true -> 10
+    if (booleanNode.asBoolean()) {
+      return IntNode.valueOf(1);
+    } else {
+      // false -> 0
+      return IntNode.valueOf(0);
+    }
   }
 
   public Map<String, List<String>> getFieldsMap() {
