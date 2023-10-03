@@ -4,6 +4,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.RequiredArgsConstructor;
 import pl.smarthouse.components.Info;
+import pl.smarthouse.components.Label;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
 import pl.smarthouse.components.tiles.Bme280Tile;
@@ -23,7 +24,7 @@ public class OverviewTab {
   }
 
   private Tile pumpAirConThrottle() {
-    final Tile tile = new Tile("recu.svg", "Actors");
+    final Tile tile = new Tile("recu.svg", new Label("Actors"));
 
     final Info circuitPump = new Info("circuit pump");
     ColorPredicates.assignOnOffState(circuitPump);
@@ -49,10 +50,12 @@ public class OverviewTab {
     final HorizontalLayout layout = new HorizontalLayout();
 
     layout.add(
-        Bme280Tile.getTile("Exchanger inlet", "airExchanger.inlet", valueContainer),
-        Bme280Tile.getTile("Exchanger outlet", "airExchanger.outlet", valueContainer),
-        Bme280Tile.getTile("Exchanger fresh-air", "airExchanger.freshAir", valueContainer),
-        Bme280Tile.getTile("Exchanger used-air", "airExchanger.userAir", valueContainer));
+        Bme280Tile.getTile(new Label("Exchanger inlet"), "airExchanger.inlet", valueContainer),
+        Bme280Tile.getTile(new Label("Exchanger outlet"), "airExchanger.outlet", valueContainer),
+        Bme280Tile.getTile(
+            new Label("Exchanger fresh-air"), "airExchanger.freshAir", valueContainer),
+        Bme280Tile.getTile(
+            new Label("Exchanger used-air"), "airExchanger.userAir", valueContainer));
     return layout;
   }
 
@@ -60,16 +63,19 @@ public class OverviewTab {
     final HorizontalLayout layout = new HorizontalLayout();
 
     layout.add(
-        Ds18b20Tile.getTile("Forced water-in", "forcedAirSystemExchanger.watterIn", valueContainer),
         Ds18b20Tile.getTile(
-            "Forced water-out", "forcedAirSystemExchanger.watterOut", valueContainer),
-        Ds18b20Tile.getTile("Forced air-in", "forcedAirSystemExchanger.airIn", valueContainer),
-        Ds18b20Tile.getTile("Forced air-out", "forcedAirSystemExchanger.airOut", valueContainer));
+            new Label("Forced water-in"), "forcedAirSystemExchanger.watterIn", valueContainer),
+        Ds18b20Tile.getTile(
+            new Label("Forced water-out"), "forcedAirSystemExchanger.watterOut", valueContainer),
+        Ds18b20Tile.getTile(
+            new Label("Forced air-in"), "forcedAirSystemExchanger.airIn", valueContainer),
+        Ds18b20Tile.getTile(
+            new Label("Forced air-out"), "forcedAirSystemExchanger.airOut", valueContainer));
     return layout;
   }
 
   private Tile createFanTile() {
-    final Tile fans = new Tile("fan.svg", "Fans");
+    final Tile fans = new Tile("fan.svg", new Label("Fans"));
 
     final Info inletSpeed = new Info("inlet speed", "%");
     ColorPredicates.assignNotZeroState(inletSpeed);

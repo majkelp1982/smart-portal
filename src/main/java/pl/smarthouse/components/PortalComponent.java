@@ -21,7 +21,8 @@ public abstract class PortalComponent {
 
   public abstract void setValue(final Object value);
 
-  public void addColorPredicates(final Predicate<Info> predicate, final ComponentColor color) {
+  public void addColorPredicates(
+      final Predicate<PortalComponent> predicate, final ComponentColor color) {
     colorPredicates.add(new ColorPredicate(predicate, color));
   }
 

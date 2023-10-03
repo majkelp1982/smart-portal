@@ -31,6 +31,8 @@ public class GuiServiceUtils {
   }
 
   public void updateData(final ModuleDto moduleDto, final ModuleDto updateObject) {
+    moduleDto.setError(updateObject.isError());
+    moduleDto.setErrorPendingAcknowledge(updateObject.isErrorPendingAcknowledge());
     if (moduleDto instanceof VentModuleDto) {
       updateVentModule((VentModuleDto) moduleDto, (VentModuleDto) updateObject);
 

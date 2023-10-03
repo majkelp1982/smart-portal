@@ -4,6 +4,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import pl.smarthouse.components.Info;
+import pl.smarthouse.components.Label;
 import pl.smarthouse.components.PortalComponent;
 import pl.smarthouse.model.ComponentColor;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
@@ -132,6 +133,12 @@ public class ColorPredicates {
     info.setColorEnabled(true);
     info.setDefaultColor(ComponentColor.NORMAL);
     info.addColorPredicates(component -> (boolean) component.getValue(), ComponentColor.ALARM);
+  }
+
+  public void assignToError(final Label label) {
+    label.setColorEnabled(true);
+    label.setDefaultColor(ComponentColor.NORMAL);
+    label.addColorPredicates(component -> (boolean) component.getValue(), ComponentColor.ALARM);
   }
 
   private double delta(final Object value1, final Object value2) {

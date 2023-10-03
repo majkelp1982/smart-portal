@@ -14,6 +14,7 @@ import com.vaadin.flow.router.Route;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.components.Info;
+import pl.smarthouse.components.Label;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
 import pl.smarthouse.service.GuiService;
@@ -103,8 +104,9 @@ public class ComfortView extends VerticalLayout {
 
   private Tile createZoneOverview(
       final String zoneName, final String valueContainerName, final ComfortModuleDto comfortDto) {
-
-    final Tile tile = new Tile("room.svg", zoneName);
+    final Label zoneNameLabel = new Label(zoneName);
+    ColorPredicates.assignToError(zoneNameLabel);
+    final Tile tile = new Tile("room.svg", zoneNameLabel);
     final Info temperature = new Info("temperature", "°C");
     temperature.setExpectedValue(
         comfortModuleParamsDto
@@ -127,6 +129,7 @@ public class ComfortView extends VerticalLayout {
 
     // Values
     final ValueContainer valueContainer = new ValueContainer(comfortDto);
+    valueContainer.put("!error", zoneNameLabel);
     valueContainer.put("sensorResponse.temperature", temperature);
     valueContainer.put("sensorResponse.humidity", humidity);
     valueContainer.put("currentOperation", currentOperation);
