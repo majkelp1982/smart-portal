@@ -33,6 +33,17 @@ public class WebService {
         .exchangeToFlux(response -> processResponse(response, tClass));
   }
 
+  public <T> Flux<T> patch(String url, final Class<T> tClass, final T object) {
+    if (!url.contains("http")) {
+      url = "http://" + url;
+    }
+    return webClient
+        .patch()
+        .uri(url)
+        .body(BodyInserters.fromValue(object))
+        .exchangeToFlux(response -> processResponse(response, tClass));
+  }
+
   private <T> Flux<T> processResponse(final ClientResponse clientResponse, final Class<T> clazz) {
     if (clientResponse.statusCode().is2xxSuccessful()) {
       return clientResponse.bodyToFlux(clazz);
