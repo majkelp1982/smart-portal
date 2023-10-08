@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 public class DiagnoseService {
   private final GuiService guiService;
   private final WebService webService;
+  private final ErrorHandlingService errorHandlingService;
   private final List<ErrorPredictionDiagnostic> errors = new ArrayList<>();
 
   public Flux<List<ErrorPredictionDiagnostic>> updateModulesErrors() {
@@ -42,18 +43,27 @@ public class DiagnoseService {
                                       pendingErrors.putAll(activeErrors);
                                       return Mono.just(pendingErrors);
                                     }))
-                    .map(errors -> toErrorPredictionDiagnostics(moduleDto.getModuleName(), errors))
+                    .onErrorResume(
+                        throwable -> {
+                          log.error(
+                              "Error occurred when getting error list from {}, error: {}",
+                              moduleDto.getModuleName(),
+                              throwable.getMessage());
+                          errorHandlingService.createConnectionIssueError(
+                              moduleDto.getModuleName(), throwable);
+                          return Mono.empty();
+                        })
+                    .map(errors -> toErrorList(moduleDto.getModuleName(), errors))
                     .map(
                         ErrorPredictionsDiagnostic ->
                             updateErrors(moduleDto.getModuleName(), ErrorPredictionsDiagnostic)));
   }
 
   private synchronized List<ErrorPredictionDiagnostic> updateErrors(
-      final String moduleName, final Object object) {
-    final HashMap<String, ErrorPredictionDiagnostic> updateErrors =
-        (HashMap<String, ErrorPredictionDiagnostic>) object;
+      final String moduleName, final List<ErrorPredictionDiagnostic> updateErrors) {
+    errorHandlingService.finishConnectionIssueError(moduleName);
     errors.removeIf(errors -> moduleName.equals(errors.getModuleName()));
-    errors.addAll(updateErrors.values());
+    errors.addAll(updateErrors);
     return errors;
   }
 
@@ -85,25 +95,29 @@ public class DiagnoseService {
     return serviceAddress;
   }
 
-  private HashMap<String, ErrorPredictionDiagnostic> toErrorPredictionDiagnostics(
-      final String moduleName, final HashMap<String, Object> errorPredictions) {
-    final HashMap<String, ErrorPredictionDiagnostic> errorPredictionDiagnostics = new HashMap<>();
-
-    errorPredictions.forEach(
-        (hashcode, errorPrediction) ->
-            errorPredictionDiagnostics.put(
-                hashcode, toErrorPredictionDiagnostic(moduleName, errorPrediction)));
-    return errorPredictionDiagnostics;
+  private List<ErrorPredictionDiagnostic> toErrorList(
+      final String moduleName, final Object objectHashMap) {
+    final HashMap<String, ErrorPredictionDiagnostic> errorPredictions =
+        (HashMap<String, ErrorPredictionDiagnostic>) objectHashMap;
+    final List<ErrorPredictionDiagnostic> mappedErrors = new ArrayList<>();
+    errorPredictions
+        .keySet()
+        .forEach(
+            key ->
+                mappedErrors.add(
+                    toErrorPredictionDiagnostic(moduleName, key, errorPredictions.get(key))));
+    return mappedErrors;
   }
 
   private ErrorPredictionDiagnostic toErrorPredictionDiagnostic(
-      final String moduleName, final Object errorPredictionObject) {
+      final String moduleName, final String hashcode, final Object errorPredictionObject) {
     final ObjectMapper objectMapper =
         new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     objectMapper.registerModule(new JavaTimeModule());
     final ErrorPredictionDiagnostic errorPredictionDiagnostic =
         objectMapper.convertValue(errorPredictionObject, ErrorPredictionDiagnostic.class);
     errorPredictionDiagnostic.setModuleName(moduleName);
+    errorPredictionDiagnostic.setHashCode(hashcode);
     return errorPredictionDiagnostic;
   }
 

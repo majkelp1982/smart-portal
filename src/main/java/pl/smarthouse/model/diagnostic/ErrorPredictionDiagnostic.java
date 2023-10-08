@@ -1,5 +1,6 @@
 package pl.smarthouse.model.diagnostic;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.*;
@@ -7,11 +8,13 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 public class ErrorPredictionDiagnostic {
+  private String hashCode;
   private String moduleName;
   private String message;
   private int priority;
   private LocalDateTime beginTimestamp;
   private LocalDateTime endTimestamp;
+  private long duration;
 
   public String getBeginTimeString() {
     final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM HH:mm");
@@ -29,5 +32,11 @@ public class ErrorPredictionDiagnostic {
     } else {
       return null;
     }
+  }
+
+  public Long getDuration() {
+    return Duration.between(
+            beginTimestamp, (endTimestamp != null) ? endTimestamp : LocalDateTime.now())
+        .toSeconds();
   }
 }

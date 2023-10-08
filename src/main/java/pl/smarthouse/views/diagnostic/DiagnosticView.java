@@ -11,11 +11,11 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.model.diagnostic.ErrorPredictionDiagnostic;
 import pl.smarthouse.service.DiagnoseService;
+import pl.smarthouse.service.ErrorHandlingService;
 import pl.smarthouse.views.MainView;
 
 @PageTitle("Smart Portal | Diagnostic")
@@ -23,37 +23,42 @@ import pl.smarthouse.views.MainView;
 @Slf4j
 public class DiagnosticView extends VerticalLayout {
   private final DiagnoseService diagnoseService;
+  private final ErrorHandlingService errorHandlingService;
   private final Grid<ErrorPredictionDiagnostic> errorsGrid = new Grid<>();
   private final Label totalErrorCountLabel = new Label();
 
-  public DiagnosticView(@Autowired final DiagnoseService diagnoseService) {
+  public DiagnosticView(
+      @Autowired final DiagnoseService diagnoseService,
+      @Autowired final ErrorHandlingService errorHandlingService) {
     this.diagnoseService = diagnoseService;
+    this.errorHandlingService = errorHandlingService;
     createView();
+    refreshErrors();
     errorsGrid.setItems(diagnoseService.getErrors());
-    UI.getCurrent()
-        .addPollListener(
-            pollEvent ->
-                this.diagnoseService
-                    .updateModulesErrors()
-                    .doOnNext(
-                        errors -> {
-                          getUI()
-                              .ifPresent(
-                                  ui ->
-                                      ui.access(
-                                          () -> {
-                                            errorsGrid.setItems(errors);
-                                            totalErrorCountLabel.setText(
-                                                "Total error: " + errors.size());
-                                          }));
-                        })
-                    .subscribe());
+    UI.getCurrent().addPollListener(pollEvent -> refreshErrors());
+  }
+
+  private void refreshErrors() {
+    this.diagnoseService
+        .updateModulesErrors()
+        .doOnNext(
+            errors -> {
+              getUI()
+                  .ifPresent(
+                      ui ->
+                          ui.access(
+                              () -> {
+                                errorHandlingService.addPortalErrors(errors);
+                                errorsGrid.setItems(errors);
+                                totalErrorCountLabel.setText("Total error: " + errors.size());
+                              }));
+            })
+        .subscribe();
   }
 
   @Override
   protected void onAttach(final AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-
     UI.getCurrent().setPollInterval(10000);
   }
 
@@ -87,6 +92,7 @@ public class DiagnosticView extends VerticalLayout {
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getPriority).setHeader("Prio");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getBeginTimeString).setHeader("Begin");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getEndTimeString).setHeader("End");
+    errorsGrid.addColumn(ErrorPredictionDiagnostic::getDuration).setHeader("Duration[s]");
     errorsGrid
         .getColumns()
         .forEach(
