@@ -1,5 +1,7 @@
 package pl.smarthouse.views.diagnostic;
 
+import static pl.smarthouse.service.ErrorHandlingService.PORTAL_MODULE;
+
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
@@ -48,7 +50,8 @@ public class DiagnosticView extends VerticalLayout {
                       ui ->
                           ui.access(
                               () -> {
-                                errorHandlingService.addPortalErrors(errors);
+                                diagnoseService.updateErrors(
+                                    PORTAL_MODULE, errorHandlingService.getErrorPredictions());
                                 errorsGrid.setItems(errors);
                                 totalErrorCountLabel.setText("Total error: " + errors.size());
                               }));
@@ -101,6 +104,7 @@ public class DiagnosticView extends VerticalLayout {
               column.setSortable(true);
               column.setAutoWidth(true);
             });
+    errorsGrid.setPageSize(1000);
     errorsGrid.setAllRowsVisible(true);
     errorsGrid.setMultiSort(true);
     errorsGrid.recalculateColumnWidths();

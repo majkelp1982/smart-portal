@@ -59,7 +59,7 @@ public class DiagnoseService {
                             updateErrors(moduleDto.getModuleName(), ErrorPredictionsDiagnostic)));
   }
 
-  private synchronized List<ErrorPredictionDiagnostic> updateErrors(
+  public synchronized List<ErrorPredictionDiagnostic> updateErrors(
       final String moduleName, final List<ErrorPredictionDiagnostic> updateErrors) {
     errorHandlingService.finishConnectionIssueError(moduleName);
     errors.removeIf(errors -> moduleName.equals(errors.getModuleName()));

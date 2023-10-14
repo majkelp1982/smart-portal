@@ -11,19 +11,14 @@ import pl.smarthouse.model.diagnostic.ErrorPredictionDiagnostic;
 @Service
 @RequiredArgsConstructor
 public class ErrorHandlingService {
+  public static final String PORTAL_MODULE = "SMART-PORTAL";
   private static final String CONNECTION_ISSUE_ID = "-1";
-  private static final String PORTAL_MODULE = "SMART-PORTAL";
   private final List<ErrorPredictionDiagnostic> errorPredictions = new ArrayList<>();
   private final Predicate<ErrorPredictionDiagnostic> isErrorNotFinished =
       errorPredictionDiagnostic -> errorPredictionDiagnostic.getEndTimestamp() == null;
 
-  public List<ErrorPredictionDiagnostic> addPortalErrors(
-      final List<ErrorPredictionDiagnostic> list) {
-    list.removeIf(
-        errorPredictionDiagnostic ->
-            errorPredictionDiagnostic.getModuleName().equals(PORTAL_MODULE));
-    list.addAll(errorPredictions);
-    return list;
+  public List<ErrorPredictionDiagnostic> getErrorPredictions() {
+    return errorPredictions;
   }
 
   public void createConnectionIssueError(final String moduleName, final Throwable throwable) {
