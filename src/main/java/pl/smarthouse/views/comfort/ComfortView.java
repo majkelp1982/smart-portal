@@ -160,15 +160,14 @@ public class ComfortView extends VerticalLayout {
     AirExchangerView.addForm(
         accordion, comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getAirExchanger());
     final FunctionType functionType = comfortDto.getFunctionType();
-    if (functionType == null || FunctionType.AIR_SUPPLY.equals(functionType)) {
-      TemperatureControlView.addForm(
-          accordion,
-          comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getTemperatureControl());
-    }
-    if (functionType == null || FunctionType.AIR_EXTRACT.equals(functionType)) {
-      HumidityAlertView.addForm(
-          accordion, comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getHumidityAlert());
-    }
+    TemperatureControlView.addForm(
+        accordion,
+        functionType,
+        comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getTemperatureControl());
+    HumidityAlertView.addForm(
+        accordion,
+        functionType,
+        comfortModuleParamsDto.get(comfortDto.getServiceAddress()).getHumidityAlert());
 
     final Button saveButton = new Button("Save all");
     saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

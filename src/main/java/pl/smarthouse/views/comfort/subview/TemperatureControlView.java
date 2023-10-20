@@ -14,10 +14,14 @@ import pl.smarthouse.components.params.TimeRangesGrid;
 import pl.smarthouse.sharedobjects.dto.comfort.core.ForcedAirControl;
 import pl.smarthouse.sharedobjects.dto.comfort.core.HeatingControl;
 import pl.smarthouse.sharedobjects.dto.comfort.core.TemperatureControl;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
 
 @UtilityClass
 public class TemperatureControlView {
-  public void addForm(final Accordion accordion, final TemperatureControl temperatureControl) {
+  public void addForm(
+      final Accordion accordion,
+      final FunctionType functionType,
+      final TemperatureControl temperatureControl) {
     validateAirExchanger(temperatureControl);
     final VerticalLayout layout = new VerticalLayout();
 
@@ -30,8 +34,10 @@ public class TemperatureControlView {
     final Accordion temperatureControlAccordion = new Accordion();
     temperatureControlAccordion.add(
         "Heating control", heatingControlView(temperatureControl.getHeatingControl()));
-    temperatureControlAccordion.add(
-        "Forced air control", forcedAirControl(temperatureControl.getForcedAirControl()));
+    if (functionType == null || FunctionType.AIR_SUPPLY.equals(functionType)) {
+      temperatureControlAccordion.add(
+          "Forced air control", forcedAirControl(temperatureControl.getForcedAirControl()));
+    }
 
     temperatureControlAccordion.close();
 

@@ -8,10 +8,17 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import lombok.experimental.UtilityClass;
 import pl.smarthouse.components.params.PercentageField;
 import pl.smarthouse.sharedobjects.dto.comfort.core.HumidityAlert;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
 
 @UtilityClass
 public class HumidityAlertView {
-  public void addForm(final Accordion accordion, final HumidityAlert humidityAlert) {
+  public void addForm(
+      final Accordion accordion,
+      final FunctionType functionType,
+      final HumidityAlert humidityAlert) {
+    if (functionType != null && !FunctionType.AIR_EXTRACT.equals(functionType)) {
+      return;
+    }
     validateAirExchanger(humidityAlert);
     final VerticalLayout layout = new VerticalLayout();
 
