@@ -4,17 +4,20 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import pl.smarthouse.exceptions.GuiServiceException;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
-import pl.smarthouse.sharedobjects.dto.core.Bme280ResponseDto;
-import pl.smarthouse.sharedobjects.dto.core.Ds18b20ResultDto;
+import pl.smarthouse.sharedobjects.dto.core.*;
+import pl.smarthouse.sharedobjects.dto.externallights.ExternalLightsModuleDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.ZoneDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.core.*;
+import pl.smarthouse.sharedobjects.dto.weather.WeatherModuleDto;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 
 @UtilityClass
+@Slf4j
 public class GuiServiceUtils {
 
   public Class<? extends ModuleDto> getModuleDtoClass(final String name) {
@@ -26,6 +29,14 @@ public class GuiServiceUtils {
       return ComfortModuleDto.class;
     }
 
+    if (name.toUpperCase().contains("EXTERNAL_LIGHTS")) {
+      return ExternalLightsModuleDto.class;
+    }
+
+    if (name.toUpperCase().contains("WEATHER")) {
+      return WeatherModuleDto.class;
+    }
+
     throw new GuiServiceException(
         String.format("Exception on getModuleDtoClass. Class not found for: %s", name));
   }
@@ -35,9 +46,13 @@ public class GuiServiceUtils {
     moduleDto.setErrorPendingAcknowledge(updateObject.isErrorPendingAcknowledge());
     if (moduleDto instanceof VentModuleDto) {
       updateVentModule((VentModuleDto) moduleDto, (VentModuleDto) updateObject);
-
     } else if (moduleDto instanceof ComfortModuleDto) {
       updateComfortModule((ComfortModuleDto) moduleDto, (ComfortModuleDto) updateObject);
+    } else if (moduleDto instanceof ExternalLightsModuleDto) {
+      updateExternalLightsModule(
+          (ExternalLightsModuleDto) moduleDto, (ExternalLightsModuleDto) updateObject);
+    } else if (moduleDto instanceof WeatherModuleDto) {
+      updateWeatherModule((WeatherModuleDto) moduleDto, (WeatherModuleDto) updateObject);
     } else {
       throw new GuiServiceException(
           String.format(
@@ -144,6 +159,23 @@ public class GuiServiceUtils {
     return ComfortModuleDto.builder().sensorResponse(Bme280ResponseDto.builder().build()).build();
   }
 
+  public WeatherModuleDto createBaseWeatherDto() {
+    return WeatherModuleDto.builder()
+        .sds011Response(Sds011ResponseDto.builder().build())
+        .bme280Response(Bme280ResponseDto.builder().build())
+        .lightIntense(PinResponseDto.builder().build())
+        .build();
+  }
+
+  public ExternalLightsModuleDto createBaseExternalLightsDto() {
+    return ExternalLightsModuleDto.builder()
+        .entrance(RdbDimmerResponseDto.builder().mode("NOT_READY").build())
+        .driveway(RdbDimmerResponseDto.builder().mode("NOT_READY").build())
+        .carport(RdbDimmerResponseDto.builder().mode("NOT_READY").build())
+        .garden(RdbDimmerResponseDto.builder().mode("NOT_READY").build())
+        .build();
+  }
+
   public VentModuleDto createBaseVentDto() {
     return VentModuleDto.builder()
         .zoneDtoHashMap(zoneDtoHashMap())
@@ -187,5 +219,33 @@ public class GuiServiceUtils {
         .airIn(Ds18b20ResultDto.builder().build())
         .airOut(Ds18b20ResultDto.builder().build())
         .build();
+  }
+
+  private void updateExternalLightsModule(
+      final ExternalLightsModuleDto externalLightsModuleDto,
+      final ExternalLightsModuleDto updateObject) {
+    log.error("updateExternalLightsModule not implemented");
+    externalLightsModuleDto.setUpdateTimestamp(updateObject.getUpdateTimestamp());
+  }
+
+  private void updateWeatherModule(
+      final WeatherModuleDto weatherModuleDto, final WeatherModuleDto updateObject) {
+    // BME280
+    updateBme280(weatherModuleDto.getBme280Response(), updateObject.getBme280Response());
+
+    // SDS011
+    final Sds011ResponseDto sds011ResponseDto = weatherModuleDto.getSds011Response();
+    final Sds011ResponseDto sds011Update = updateObject.getSds011Response();
+
+    sds011ResponseDto.setMode(sds011Update.getMode());
+    sds011ResponseDto.setError(sds011Update.isError());
+    sds011ResponseDto.setResponseUpdate(sds011Update.getResponseUpdate());
+    sds011ResponseDto.setPm10(sds011Update.getPm10());
+    sds011ResponseDto.setPm025(sds011Update.getPm025());
+
+    // LightIntense
+    weatherModuleDto.setLightIntense(updateObject.getLightIntense());
+
+    weatherModuleDto.setUpdateTimestamp(updateObject.getUpdateTimestamp());
   }
 }

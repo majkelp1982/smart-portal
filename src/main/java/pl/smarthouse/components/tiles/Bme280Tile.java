@@ -33,7 +33,7 @@ public class Bme280Tile {
     valueContainer.put(path + ".temperature", temperature);
     valueContainer.put(path + ".pressure", pressure);
     valueContainer.put(path + ".humidity", humidity);
-    valueContainer.put(path + ".error", error);
+    valueContainer.put(path + ".!error", error);
     valueContainer.put(path + ".!responseUpdate", update);
     return tile;
   }

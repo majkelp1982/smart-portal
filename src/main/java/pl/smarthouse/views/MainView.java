@@ -16,6 +16,7 @@ import pl.smarthouse.views.charts.ChartsView;
 import pl.smarthouse.views.comfort.ComfortView;
 import pl.smarthouse.views.diagnostic.DiagnosticView;
 import pl.smarthouse.views.ventilation.VentilationView;
+import pl.smarthouse.views.weather.WeatherView;
 
 @PageTitle("Main")
 @Route(value = "")
@@ -37,13 +38,15 @@ public class MainView extends AppLayout {
     final VerticalLayout drawer = new VerticalLayout();
     final RouterLink comfortViewLink =
         createDrawerElement("comfort.svg", "Comfort", ComfortView.class);
+    final RouterLink weatherViewLink =
+        createDrawerElement("cloud.svg", "Weather", WeatherView.class);
     final RouterLink ventViewLink =
         createDrawerElement("recu.svg", "Ventilation", VentilationView.class);
     final RouterLink chartsViewLink = createDrawerElement("graph.svg", "Charts", ChartsView.class);
     final RouterLink diagnosticViewLink =
         createDrawerElement("support.svg", "Diagnostic", DiagnosticView.class);
 
-    drawer.add(comfortViewLink, ventViewLink, chartsViewLink, diagnosticViewLink);
+    drawer.add(comfortViewLink, ventViewLink, weatherViewLink, chartsViewLink, diagnosticViewLink);
     addToDrawer(drawer);
   }
 

@@ -27,6 +27,17 @@ public class ColorPredicates {
         component -> Integer.valueOf(component.getValue().toString()) > 0, ComponentColor.ON);
   }
 
+  public void assignToValue(final Info info, final double warning, final double alarm) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OK);
+    info.addColorPredicates(
+        component -> Double.valueOf(component.getValue().toString()) >= warning,
+        ComponentColor.WARNING);
+    info.addColorPredicates(
+        component -> Double.valueOf(component.getValue().toString()) >= alarm,
+        ComponentColor.ALARM);
+  }
+
   public void assignToCurrentOperation(final Info info) {
     info.setColorEnabled(true);
     info.setDefaultColor(ComponentColor.OFF);
@@ -118,13 +129,17 @@ public class ColorPredicates {
   }
 
   public void assignToUpdateTimestamp(final Info info) {
+    assignToUpdateTimestamp(info, 2);
+  }
+
+  public void assignToUpdateTimestamp(final Info info, final int timeoutInMinutes) {
     info.setColorEnabled(true);
     info.setDefaultColor(ComponentColor.NORMAL);
     info.addColorPredicates(
         component -> {
           final LocalTime updateTimestamp = LocalTime.parse(component.getValue().toString());
           return (Objects.isNull(updateTimestamp)
-              || LocalTime.now().isAfter(updateTimestamp.plusMinutes(2)));
+              || LocalTime.now().isAfter(updateTimestamp.plusMinutes(timeoutInMinutes)));
         },
         ComponentColor.ALARM);
   }

@@ -49,6 +49,16 @@ public class GuiService implements ApplicationListener<ApplicationStartedEvent> 
       moduleDto.setServiceAddress(settingsDto.getServiceAddress() + "/comfort");
     }
 
+    if (settingsDto.getType().contains("WEATHER")) {
+      moduleDto = GuiServiceUtils.createBaseWeatherDto();
+      moduleDto.setServiceAddress(settingsDto.getServiceAddress() + "/weather");
+    }
+
+    if (settingsDto.getType().contains("EXTERNAL_LIGHTS")) {
+      moduleDto = GuiServiceUtils.createBaseExternalLightsDto();
+      moduleDto.setServiceAddress(settingsDto.getServiceAddress() + "/lights");
+    }
+
     if (Objects.isNull(moduleDto)) {
       throw new GuiServiceException(
           String.format(
