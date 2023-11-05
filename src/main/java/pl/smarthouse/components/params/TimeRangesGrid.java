@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.NonNull;
-import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRange;
+import pl.smarthouse.sharedobjects.dto.core.TimeRange;
 
 @Data
 public class TimeRangesGrid extends VerticalLayout {
