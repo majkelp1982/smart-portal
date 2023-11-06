@@ -62,8 +62,8 @@ public class TimeRangesGrid extends VerticalLayout {
 
     grid.setAllRowsVisible(true);
     grid.setSelectionMode(Grid.SelectionMode.MULTI);
-    grid.addColumn(TimeRange::getFrom).setHeader("od").setAutoWidth(true).setFlexGrow(0);
-    grid.addColumn(TimeRange::getTo).setHeader("do").setAutoWidth(true).setFlexGrow(0);
+    grid.addColumn(TimeRange::getFrom).setHeader("from").setAutoWidth(true).setFlexGrow(0);
+    grid.addColumn(TimeRange::getTo).setHeader("to").setAutoWidth(true).setFlexGrow(0);
 
     setItems(timeRanges);
 

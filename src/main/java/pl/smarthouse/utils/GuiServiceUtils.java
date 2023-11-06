@@ -10,6 +10,7 @@ import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
 import pl.smarthouse.sharedobjects.dto.core.*;
 import pl.smarthouse.sharedobjects.dto.externallights.ExternalLightsModuleDto;
+import pl.smarthouse.sharedobjects.dto.externallights.core.LightZoneDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.ZoneDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.core.*;
@@ -42,8 +43,12 @@ public class GuiServiceUtils {
   }
 
   public void updateData(final ModuleDto moduleDto, final ModuleDto updateObject) {
+    // Update basic values
     moduleDto.setError(updateObject.isError());
     moduleDto.setErrorPendingAcknowledge(updateObject.isErrorPendingAcknowledge());
+    moduleDto.setUpdateTimestamp(LocalDateTime.now());
+
+    // Update module specific
     if (moduleDto instanceof VentModuleDto) {
       updateVentModule((VentModuleDto) moduleDto, (VentModuleDto) updateObject);
     } else if (moduleDto instanceof ComfortModuleDto) {
@@ -98,8 +103,6 @@ public class GuiServiceUtils {
 
     ventDto.setCircuitPump(updateObject.getCircuitPump());
     ventDto.setAirCondition(updateObject.getAirCondition());
-
-    ventDto.setUpdateTimestamp(LocalDateTime.now());
   }
 
   private void updateVentZone(final ZoneDto zoneDto, final ZoneDto updateZone) {
@@ -151,8 +154,6 @@ public class GuiServiceUtils {
     comfortDto.setCurrentOperation(updateObject.getCurrentOperation());
     comfortDto.setRequiredPower(updateObject.getRequiredPower());
     comfortDto.setLeftHoldTimeInMinutes(updateObject.getLeftHoldTimeInMinutes());
-
-    comfortDto.setUpdateTimestamp(LocalDateTime.now());
   }
 
   public ComfortModuleDto createBaseComfortDto() {
@@ -169,10 +170,22 @@ public class GuiServiceUtils {
 
   public ExternalLightsModuleDto createBaseExternalLightsDto() {
     return ExternalLightsModuleDto.builder()
-        .entrance(RdbDimmerResponseDto.builder().mode("NOT_READY").build())
-        .driveway(RdbDimmerResponseDto.builder().mode("NOT_READY").build())
-        .carport(RdbDimmerResponseDto.builder().mode("NOT_READY").build())
-        .garden(RdbDimmerResponseDto.builder().mode("NOT_READY").build())
+        .entrance(
+            LightZoneDto.builder()
+                .rdbDimmerResponse(RdbDimmerResponseDto.builder().build())
+                .build())
+        .driveway(
+            LightZoneDto.builder()
+                .rdbDimmerResponse(RdbDimmerResponseDto.builder().build())
+                .build())
+        .carport(
+            LightZoneDto.builder()
+                .rdbDimmerResponse(RdbDimmerResponseDto.builder().build())
+                .build())
+        .garden(
+            LightZoneDto.builder()
+                .rdbDimmerResponse(RdbDimmerResponseDto.builder().build())
+                .build())
         .build();
   }
 
@@ -224,8 +237,28 @@ public class GuiServiceUtils {
   private void updateExternalLightsModule(
       final ExternalLightsModuleDto externalLightsModuleDto,
       final ExternalLightsModuleDto updateObject) {
-    log.error("updateExternalLightsModule not implemented");
-    externalLightsModuleDto.setUpdateTimestamp(updateObject.getUpdateTimestamp());
+    updateRdbDimmerResponseDto(
+        externalLightsModuleDto.getEntrance().getRdbDimmerResponse(),
+        updateObject.getEntrance().getRdbDimmerResponse());
+    updateRdbDimmerResponseDto(
+        externalLightsModuleDto.getDriveway().getRdbDimmerResponse(),
+        updateObject.getDriveway().getRdbDimmerResponse());
+    updateRdbDimmerResponseDto(
+        externalLightsModuleDto.getCarport().getRdbDimmerResponse(),
+        updateObject.getCarport().getRdbDimmerResponse());
+    updateRdbDimmerResponseDto(
+        externalLightsModuleDto.getGarden().getRdbDimmerResponse(),
+        updateObject.getGarden().getRdbDimmerResponse());
+  }
+
+  private void updateRdbDimmerResponseDto(
+      final RdbDimmerResponseDto rdbDimmerResponseDto, final RdbDimmerResponseDto update) {
+    rdbDimmerResponseDto.setMode(update.getMode());
+    rdbDimmerResponseDto.setState(update.isState());
+    rdbDimmerResponseDto.setPower(update.getPower());
+    rdbDimmerResponseDto.setGoalPower(update.getGoalPower());
+    rdbDimmerResponseDto.setIncremental(update.isIncremental());
+    rdbDimmerResponseDto.setMsDelay(update.getMsDelay());
   }
 
   private void updateWeatherModule(
@@ -245,7 +278,5 @@ public class GuiServiceUtils {
 
     // LightIntense
     weatherModuleDto.setLightIntense(updateObject.getLightIntense());
-
-    weatherModuleDto.setUpdateTimestamp(updateObject.getUpdateTimestamp());
   }
 }

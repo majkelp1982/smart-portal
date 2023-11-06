@@ -3,6 +3,7 @@ package pl.smarthouse.views.utils;
 import java.time.LocalTime;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
+import pl.smarthouse.components.Button;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Label;
 import pl.smarthouse.components.PortalComponent;
@@ -18,6 +19,12 @@ public class ColorPredicates {
     info.setColorEnabled(true);
     info.setDefaultColor(ComponentColor.OFF);
     info.addColorPredicates(component -> State.ON.equals(component.getValue()), ComponentColor.ON);
+  }
+
+  public void assignTrueFalseState(final Button button) {
+    button.setColorEnabled(true);
+    button.setDefaultColor(ComponentColor.OFF);
+    button.addColorPredicates(component -> (boolean) component.getValue(), ComponentColor.ON);
   }
 
   public void assignNotZeroState(final Info info) {
