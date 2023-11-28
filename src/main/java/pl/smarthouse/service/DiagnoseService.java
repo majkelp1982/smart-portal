@@ -3,6 +3,7 @@ package pl.smarthouse.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,12 +18,14 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class DiagnoseService {
+  private static final String WAITING_FOR_MODULE_RESPONSE = "WAITING FOR MODULE RESPONSE";
   private final GuiService guiService;
   private final WebService webService;
   private final ErrorHandlingService errorHandlingService;
   private final List<ErrorPredictionDiagnostic> errors = new ArrayList<>();
 
   public Flux<List<ErrorPredictionDiagnostic>> updateModulesErrors() {
+    initModuleErrors();
     return Flux.fromStream(guiService.getModuleDtos().stream())
         .flatMap(
             moduleDto ->
@@ -54,9 +57,15 @@ public class DiagnoseService {
                           return Mono.empty();
                         })
                     .map(errors -> toErrorList(moduleDto.getModuleName(), errors))
+                    .doOnNext(
+                        list ->
+                            log.info(
+                                "Updating errors. Module: {}, list size: {}",
+                                moduleDto.getModuleName(),
+                                errors.size()))
                     .map(
-                        ErrorPredictionsDiagnostic ->
-                            updateErrors(moduleDto.getModuleName(), ErrorPredictionsDiagnostic)));
+                        errorPredictionsDiagnostic ->
+                            updateErrors(moduleDto.getModuleName(), errorPredictionsDiagnostic)));
   }
 
   public synchronized List<ErrorPredictionDiagnostic> updateErrors(
@@ -123,5 +132,22 @@ public class DiagnoseService {
 
   public List<ErrorPredictionDiagnostic> getErrors() {
     return errors;
+  }
+
+  private void initModuleErrors() {
+    guiService.getModuleDtos().stream()
+        .map(moduleDto -> createInitModuleError(moduleDto.getModuleName()))
+        .forEach(
+            errorPredictionDiagnostic ->
+                updateErrors(
+                    errorPredictionDiagnostic.getModuleName(), List.of(errorPredictionDiagnostic)));
+  }
+
+  private ErrorPredictionDiagnostic createInitModuleError(final String moduleName) {
+    final ErrorPredictionDiagnostic errorPredictionDiagnostic = new ErrorPredictionDiagnostic();
+    errorPredictionDiagnostic.setModuleName(moduleName);
+    errorPredictionDiagnostic.setMessage(WAITING_FOR_MODULE_RESPONSE);
+    errorPredictionDiagnostic.setBeginTimestamp(LocalDateTime.now());
+    return errorPredictionDiagnostic;
   }
 }

@@ -56,13 +56,14 @@ public class DiagnosticView extends VerticalLayout {
                                 totalErrorCountLabel.setText("Total error: " + errors.size());
                               }));
             })
+        .doOnSubscribe(subscription -> log.info("Refreshing module errors"))
         .subscribe();
   }
 
   @Override
   protected void onAttach(final AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    UI.getCurrent().setPollInterval(10000);
+    UI.getCurrent().setPollInterval(60000);
   }
 
   @Override

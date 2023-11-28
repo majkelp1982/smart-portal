@@ -190,7 +190,7 @@ public class ChartService {
     }
   }
 
-  public Map<String, List<String>> getFieldsMap() {
+  public Map<String, List<String>> getFieldsMapFromModules() {
     final Map<String, List<String>> map = new HashMap<>();
     log.info("Get fields maps started...");
     guiService.getModuleDtos().stream()

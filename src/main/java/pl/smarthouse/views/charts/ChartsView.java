@@ -109,7 +109,8 @@ public class ChartsView extends VerticalLayout {
   }
 
   private void createDialog() {
-    chartService.prepareMultiSelectListBox(chartService.getFieldsMap(), multiSelectListMapListener);
+    chartService.prepareMultiSelectListBox(
+        chartService.getFieldsMapFromModules(), multiSelectListMapListener);
 
     final Button deselectAllButton = new Button("deselect all");
     deselectAllButton.addClickListener(
@@ -224,8 +225,6 @@ public class ChartsView extends VerticalLayout {
           .withLabels(
               LabelsBuilder.get()
                   .withFormatter("function(val) {if (val) {return 'true'; } else return 'false';}")
-                  //                                                  .withFormatter(new
-                  // StringFormatter())
                   .build())
           .build();
     }
