@@ -59,6 +59,11 @@ public class GuiService implements ApplicationListener<ApplicationStartedEvent> 
       moduleDto.setServiceAddress(settingsDto.getServiceAddress() + "/lights");
     }
 
+    if (settingsDto.getType().contains("FIREPLACE")) {
+      moduleDto = GuiServiceUtils.createBaseFireplaceDto();
+      moduleDto.setServiceAddress(settingsDto.getServiceAddress() + "/fireplace");
+    }
+
     if (Objects.isNull(moduleDto)) {
       throw new GuiServiceException(
           String.format(

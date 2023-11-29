@@ -1,6 +1,7 @@
 package pl.smarthouse.views.utils;
 
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import pl.smarthouse.components.Button;
@@ -8,6 +9,7 @@ import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Label;
 import pl.smarthouse.components.PortalComponent;
 import pl.smarthouse.model.ComponentColor;
+import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.ThrottleState;
 import pl.smarthouse.sharedobjects.enums.Operation;
@@ -18,7 +20,17 @@ public class ColorPredicates {
   public void assignOnOffState(final Info info) {
     info.setColorEnabled(true);
     info.setDefaultColor(ComponentColor.OFF);
-    info.addColorPredicates(component -> State.ON.equals(component.getValue()), ComponentColor.ON);
+    info.addColorPredicates(
+        component -> State.ON.toString().equals(component.getValue().toString()),
+        ComponentColor.ON);
+  }
+
+  public void assignOnOffState(final Button button) {
+    button.setColorEnabled(true);
+    button.setDefaultColor(ComponentColor.OFF);
+    button.addColorPredicates(
+        component -> State.ON.toString().equals(component.getValue().toString()),
+        ComponentColor.ON);
   }
 
   public void assignTrueFalseState(final Button button) {
@@ -50,6 +62,17 @@ public class ColorPredicates {
     info.setDefaultColor(ComponentColor.OFF);
     info.addColorPredicates(
         component -> !Operation.STANDBY.equals(component.getValue()), ComponentColor.ON);
+  }
+
+  public void assignToMode(final Info info) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OFF);
+    info.addColorPredicates(
+        component -> Mode.ERROR.equals(component.getValue()), ComponentColor.ALARM);
+    final List onModes = List.of(Mode.STANDBY, Mode.HEATING);
+    info.addColorPredicates(component -> onModes.contains(component.getValue()), ComponentColor.ON);
+    info.addColorPredicates(
+        component -> Mode.COOLING.equals(component.getValue()), ComponentColor.WARNING);
   }
 
   public void assignToThrottleState(final Info info) {

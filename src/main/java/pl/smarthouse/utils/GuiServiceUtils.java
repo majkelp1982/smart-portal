@@ -11,6 +11,10 @@ import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
 import pl.smarthouse.sharedobjects.dto.core.*;
 import pl.smarthouse.sharedobjects.dto.externallights.ExternalLightsModuleDto;
 import pl.smarthouse.sharedobjects.dto.externallights.core.LightZoneDto;
+import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleDto;
+import pl.smarthouse.sharedobjects.dto.fireplace.core.Throttle;
+import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
+import pl.smarthouse.sharedobjects.dto.fireplace.enums.State;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.ZoneDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.core.*;
@@ -38,6 +42,10 @@ public class GuiServiceUtils {
       return WeatherModuleDto.class;
     }
 
+    if (name.toUpperCase().contains("FIREPLACE")) {
+      return FireplaceModuleDto.class;
+    }
+
     throw new GuiServiceException(
         String.format("Exception on getModuleDtoClass. Class not found for: %s", name));
   }
@@ -58,6 +66,8 @@ public class GuiServiceUtils {
           (ExternalLightsModuleDto) moduleDto, (ExternalLightsModuleDto) updateObject);
     } else if (moduleDto instanceof WeatherModuleDto) {
       updateWeatherModule((WeatherModuleDto) moduleDto, (WeatherModuleDto) updateObject);
+    } else if (moduleDto instanceof FireplaceModuleDto) {
+      updateFireplaceModule((FireplaceModuleDto) moduleDto, (FireplaceModuleDto) updateObject);
     } else {
       throw new GuiServiceException(
           String.format(
@@ -278,5 +288,33 @@ public class GuiServiceUtils {
 
     // LightIntense
     weatherModuleDto.setLightIntense(updateObject.getLightIntense());
+  }
+
+  public FireplaceModuleDto createBaseFireplaceDto() {
+    return FireplaceModuleDto.builder()
+        .mode(Mode.OFF)
+        .state(State.OFF)
+        .waterIn(Ds18b20ResultDto.builder().build())
+        .waterOut(Ds18b20ResultDto.builder().build())
+        .chimney(Ds18b20ResultDto.builder().build())
+        .pump(State.OFF)
+        .throttle(new Throttle())
+        .build();
+  }
+
+  private void updateFireplaceModule(
+      final FireplaceModuleDto fireplaceModuleDto, final FireplaceModuleDto updateObject) {
+    fireplaceModuleDto.setMode(updateObject.getMode());
+    fireplaceModuleDto.setState(updateObject.getState());
+
+    updateDs18b20(fireplaceModuleDto.getWaterIn(), updateObject.getWaterIn());
+    updateDs18b20(fireplaceModuleDto.getWaterOut(), updateObject.getWaterOut());
+    updateDs18b20(fireplaceModuleDto.getChimney(), updateObject.getChimney());
+
+    fireplaceModuleDto.setPump(updateObject.getPump());
+    fireplaceModuleDto.getThrottle().setGoalPosition(updateObject.getThrottle().getGoalPosition());
+    fireplaceModuleDto
+        .getThrottle()
+        .setCurrentPosition(updateObject.getThrottle().getCurrentPosition());
   }
 }
