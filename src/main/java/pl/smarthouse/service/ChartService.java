@@ -91,8 +91,7 @@ public class ChartService {
     final LocalDateTime time =
         LocalDateTime.from(
                 OffsetDateTime.parse(jsonNode.get("saveTimestamp").get("$date").asText()))
-            .plusHours(FIX_DATETIME_OFFSET_IN_HOURS)
-            .plusSeconds(CET_TIME_OFFSET_IN_SECONDS);
+            .plusSeconds(CET_TIME_OFFSET_IN_SECONDS * 2);
     final String timeString = time.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     return new Coordinate(timeString, getValue(fieldPath, jsonNode));
   }
