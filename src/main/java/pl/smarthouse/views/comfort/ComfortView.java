@@ -12,6 +12,7 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import java.util.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Label;
@@ -32,6 +33,7 @@ import pl.smarthouse.views.utils.ColorPredicates;
 
 @PageTitle("Smart Portal | Comfort")
 @Route(value = "Comfort", layout = MainView.class)
+@Slf4j
 public class ComfortView extends VerticalLayout {
   final List<HorizontalLayout> horizontalOverviewTiles = new ArrayList<>();
   private final GuiService guiService;
@@ -49,8 +51,8 @@ public class ComfortView extends VerticalLayout {
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
-              valueContainerMap.values().stream()
-                  .forEach(valueContainer -> valueContainer.updateValues());
+              log.info("Pool listener triggered for class: {}", this.getClass().toString());
+              valueContainerMap.values().stream().forEach(ValueContainer::updateValues);
             });
   }
 

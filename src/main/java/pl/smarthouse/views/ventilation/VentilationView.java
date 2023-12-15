@@ -9,8 +9,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import pl.smarthouse.components.ValueContainer;
 import pl.smarthouse.service.GuiService;
 import pl.smarthouse.service.ParamsService;
@@ -23,7 +23,7 @@ import pl.smarthouse.views.ventilation.tabs.ZoneTab;
 
 @PageTitle("Smart Portal | Ventilation")
 @Route(value = "Ventilation", layout = MainView.class)
-@EnableScheduling
+@Slf4j
 public class VentilationView extends VerticalLayout {
   private final ParamsService paramsService;
   private final ValueContainer valueContainer;
@@ -46,6 +46,7 @@ public class VentilationView extends VerticalLayout {
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
+              log.info("Pool listener triggered for class: {}", this.getClass().toString());
               valueContainer.updateValues();
             });
   }

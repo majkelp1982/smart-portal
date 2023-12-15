@@ -14,6 +14,7 @@ import pl.smarthouse.properties.ModuleManagerProperties;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.SettingsDto;
 import pl.smarthouse.utils.GuiServiceUtils;
+import reactor.core.publisher.Flux;
 
 @Service
 @RequiredArgsConstructor
@@ -74,22 +75,17 @@ public class GuiService implements ApplicationListener<ApplicationStartedEvent> 
     moduleList.add(moduleDto);
   }
 
-  @Scheduled(fixedDelay = 10000)
-  public void refreshScheduler() {
-    moduleList.forEach(moduleDto -> updateModel(moduleDto.getModuleName()));
-  }
-
-  private void updateModel(final String name) {
-    moduleList.stream()
-        .filter(moduleDto -> moduleDto.getModuleName().contains(name))
-        .forEach(
+  @Scheduled(fixedDelay = 5000)
+  public void updateModelsScheduler() {
+    Flux.fromIterable(moduleList)
+        .flatMap(
             moduleDto ->
                 webService
                     .get(
                         moduleDto.getServiceAddress(),
                         GuiServiceUtils.getModuleDtoClass(moduleDto.getModuleName()))
-                    .doOnNext(updateData -> GuiServiceUtils.updateData(moduleDto, updateData))
-                    .subscribe());
+                    .doOnNext(updateData -> GuiServiceUtils.updateData(moduleDto, updateData)))
+        .subscribe();
   }
 
   public List<ModuleDto> getModuleDtos() {

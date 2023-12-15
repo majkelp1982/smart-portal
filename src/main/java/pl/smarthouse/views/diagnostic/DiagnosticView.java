@@ -37,7 +37,12 @@ public class DiagnosticView extends VerticalLayout {
     createView();
     refreshErrors();
     errorsGrid.setItems(diagnoseService.getErrors());
-    UI.getCurrent().addPollListener(pollEvent -> refreshErrors());
+    UI.getCurrent()
+        .addPollListener(
+            pollEvent -> {
+              log.info("Pool listener triggered for class: {}", this.getClass().toString());
+              refreshErrors();
+            });
   }
 
   private void refreshErrors() {

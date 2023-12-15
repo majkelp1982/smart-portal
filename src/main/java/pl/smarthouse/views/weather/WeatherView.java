@@ -7,8 +7,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Label;
 import pl.smarthouse.components.Tile;
@@ -21,7 +21,7 @@ import pl.smarthouse.views.utils.ColorPredicates;
 
 @PageTitle("Smart Portal | Weather")
 @Route(value = "Weather", layout = MainView.class)
-@EnableScheduling
+@Slf4j
 public class WeatherView extends VerticalLayout {
   private final ValueContainer valueContainer;
   private final WeatherModuleDto weatherModuleDto;
@@ -39,6 +39,7 @@ public class WeatherView extends VerticalLayout {
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
+              log.info("Pool listener triggered for class: {}", this.getClass().toString());
               valueContainer.updateValues();
             });
   }
