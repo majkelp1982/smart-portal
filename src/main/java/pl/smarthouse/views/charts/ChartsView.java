@@ -18,11 +18,9 @@ import com.github.appreciated.apexcharts.helper.StringFormatter;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -42,7 +40,6 @@ import reactor.core.publisher.Flux;
 @Route(value = "Charts", layout = MainView.class)
 public class ChartsView extends VerticalLayout {
   private final ChartService chartService;
-  private final Dialog manageDialog = new Dialog();
   private final HorizontalLayout apexChartHolder = new HorizontalLayout();
   private LocalDateTime chartToTimestamp = LocalDateTime.now();
   private LocalDateTime chartFromTimestamp = chartToTimestamp.minusDays(1);
@@ -72,7 +69,8 @@ public class ChartsView extends VerticalLayout {
     final Button manageButton = new Button("Manage charts");
     manageButton.addClickListener(
         buttonClickEvent -> {
-          createDialog();
+          final Dialog manageDialog =
+              new DialogView(chartService).createDialog(multiSelectListMapListener);
           manageDialog.open();
         });
 
@@ -106,31 +104,6 @@ public class ChartsView extends VerticalLayout {
     add(apexChartHolder, bottomLayout);
     buildChart(List.of(new Series<>()));
     updateSeries();
-  }
-
-  private void createDialog() {
-    chartService.prepareMultiSelectListBox(
-        chartService.getFieldsMapFromModules(), multiSelectListMapListener);
-
-    final Button deselectAllButton = new Button("deselect all");
-    deselectAllButton.addClickListener(
-        buttonClickEvent -> {
-          chartService.deselectAllItems();
-        });
-
-    final Accordion accordion = createAccordion(chartService.getMultiSelectListsMap());
-
-    manageDialog.setMinWidth("300px");
-    manageDialog.removeAll();
-    manageDialog.add(deselectAllButton, accordion);
-  }
-
-  private Accordion createAccordion(final Map<String, MultiSelectListBox> multiSelectListsMap) {
-    final Accordion accordion = new Accordion();
-    multiSelectListsMap.keySet().stream()
-        .sorted()
-        .forEach(moduleName -> accordion.add(moduleName, multiSelectListsMap.get(moduleName)));
-    return accordion;
   }
 
   private ApexChartsBuilder getChartBuilder() {

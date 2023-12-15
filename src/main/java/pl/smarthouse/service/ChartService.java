@@ -105,6 +105,9 @@ public class ChartService {
   }
 
   public List<Coordinate> handleNotANumberValues(final List<Coordinate> coordinates) {
+    if (coordinates.size() == 0) {
+      return new ArrayList<>();
+    }
     if (!(coordinates.get(0).getY()[0] instanceof IntNode)
         && !(coordinates.get(0).getY()[0] instanceof DoubleNode)) {
       final List<Coordinate> results = new ArrayList<>();
