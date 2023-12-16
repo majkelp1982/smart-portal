@@ -192,30 +192,29 @@ public class ChartService {
     }
   }
 
-  public Map<String, List<String>> getFieldsMapFromModules() {
-    final Map<String, List<String>> map = new HashMap<>();
-    log.info("Get fields maps started...");
-    guiService.getModuleDtos().stream()
-        .map(moduleDto -> moduleDto.getModuleName().toLowerCase())
+  public Flux<Map<String, List<String>>> getFieldsMapFromModules() {
+    return Flux.fromIterable(guiService.getModuleDtos())
         .parallel()
-        .forEach(
-            moduleName -> {
-              log.info("Query module name: {}", moduleName);
-              moduleRepository
-                  .getLastModuleData(moduleName, String.class)
-                  .map(this::getJsonObjectFromString)
-                  .flatMapMany(jsonNode -> Flux.fromIterable(getJsonFields(jsonNode, "")))
-                  .filter(
-                      field ->
-                          EXCLUSION_LIST.stream()
-                              .noneMatch(excludedField -> field.contains(excludedField)))
-                  .collectList()
-                  .doOnNext(list -> map.put(moduleName, list))
-                  .block();
-              log.info("Finished collecting list for module name: {}", moduleName);
-            });
-    log.info("Get fields maps completed...");
-    return map;
+        .map(moduleDto -> moduleDto.getModuleName().toLowerCase())
+        .doOnNext(moduleName -> log.info("Query module name: {}", moduleName))
+        .flatMap(
+            moduleName ->
+                moduleRepository
+                    .getLastModuleData(moduleName, String.class)
+                    .map(this::getJsonObjectFromString)
+                    .flatMapMany(jsonNode -> Flux.fromIterable(getJsonFields(jsonNode, "")))
+                    .filter(
+                        field ->
+                            EXCLUSION_LIST.stream()
+                                .noneMatch(excludedField -> field.contains(excludedField)))
+                    .collectList()
+                    .map(fieldList -> Map.of(moduleName, fieldList))
+                    .doOnNext(
+                        signal ->
+                            log.info("Finished collecting list for module name: {}", moduleName)))
+        .sequential()
+        .doOnSubscribe(subscription -> log.info("Get fields maps started..."))
+        .doOnComplete(() -> log.info("Get fields maps completed..."));
   }
 
   private List<String> getJsonFields(final JsonNode jsonNode, final String prefix) {

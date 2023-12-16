@@ -2,10 +2,14 @@ package pl.smarthouse.views.charts;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -17,16 +21,21 @@ public class DialogView {
   private final ChartService chartService;
 
   public Dialog createDialog(final Consumer<Set<String>> eventListenerConsumer) {
-    chartService.prepareMultiSelectListBox(
-        chartService.getFieldsMapFromModules(), eventListenerConsumer);
+    final Notification notification = new Notification();
+    notification.setDuration(1000);
+    final Map<String, List<String>> fieldMap = new HashMap<>();
+    chartService.getFieldsMapFromModules().doOnNext(fieldMap::putAll).blockLast();
+
+    chartService.prepareMultiSelectListBox(fieldMap, eventListenerConsumer);
 
     final HorizontalLayout layout = createLayout(chartService.getMultiSelectListsMap());
 
     final Dialog manageDialog = new Dialog();
     manageDialog.setHeight("600px");
-    manageDialog.setModal(false);
+    manageDialog.setModal(true);
     manageDialog.setResizable(true);
     manageDialog.setDraggable(true);
+    manageDialog.setCloseOnOutsideClick(true);
     manageDialog.setMinWidth("300px");
     manageDialog.removeAll();
     manageDialog.add(layout);
@@ -39,6 +48,13 @@ public class DialogView {
           chartService.deselectAllItems();
         });
     manageDialog.getFooter().add(deselectAllButton, closeButton);
+    final H2 headline = new H2("Manage charts");
+    final HorizontalLayout header = new HorizontalLayout(headline);
+    header.getElement().getClassList().add("draggable");
+    header.getStyle().set("cursor", "move");
+    header.setWidthFull();
+    header.setSpacing(true);
+    manageDialog.getHeader().add(header);
     return manageDialog;
   }
 
