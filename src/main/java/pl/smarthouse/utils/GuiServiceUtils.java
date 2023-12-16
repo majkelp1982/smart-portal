@@ -113,6 +113,7 @@ public class GuiServiceUtils {
 
     ventDto.setCircuitPump(updateObject.getCircuitPump());
     ventDto.setAirCondition(updateObject.getAirCondition());
+    ventDto.setFireplaceAirOverpressureActive(updateObject.getFireplaceAirOverpressureActive());
   }
 
   private void updateVentZone(final ZoneDto zoneDto, final ZoneDto updateZone) {

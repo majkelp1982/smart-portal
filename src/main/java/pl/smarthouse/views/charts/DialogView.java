@@ -43,10 +43,7 @@ public class DialogView {
     final Button closeButton = new Button("close");
     closeButton.addClickListener(buttonClickEvent -> manageDialog.close());
     final Button deselectAllButton = new Button("deselect all");
-    deselectAllButton.addClickListener(
-        buttonClickEvent -> {
-          chartService.deselectAllItems();
-        });
+    deselectAllButton.addClickListener(buttonClickEvent -> chartService.deselectAllItems());
     manageDialog.getFooter().add(deselectAllButton, closeButton);
     final H2 headline = new H2("Manage charts");
     final HorizontalLayout header = new HorizontalLayout(headline);

@@ -12,6 +12,23 @@ public class ParamTab {
   public VerticalLayout get(final VentModuleParamsDto ventModuleParamsDto) {
     final VerticalLayout layout = new VerticalLayout();
 
+    final Checkbox fireplaceAirOverpressureCheckBox = new Checkbox("fireplace air overpressure");
+    fireplaceAirOverpressureCheckBox.setValue(
+        ventModuleParamsDto.isFireplaceAirOverpressureEnabled());
+    fireplaceAirOverpressureCheckBox.addValueChangeListener(
+        event ->
+            ventModuleParamsDto.setFireplaceAirOverpressureEnabled(
+                fireplaceAirOverpressureCheckBox.getValue()));
+
+    final IntegerField fireplaceAirOverpressureLevelField =
+        new PercentageField("air overpressure level");
+    fireplaceAirOverpressureLevelField.setValue(
+        ventModuleParamsDto.getFireplaceAirOverpressureLevel());
+    fireplaceAirOverpressureLevelField.addValueChangeListener(
+        event ->
+            ventModuleParamsDto.setFireplaceAirOverpressureLevel(
+                fireplaceAirOverpressureLevelField.getValue()));
+
     final Checkbox humidityAlertCheckBox = new Checkbox("humidity alert");
     humidityAlertCheckBox.setValue(ventModuleParamsDto.isHumidityAlertEnabled());
     humidityAlertCheckBox.addValueChangeListener(
@@ -62,6 +79,8 @@ public class ParamTab {
         new TimeRangesGrid("Night hours", ventModuleParamsDto.getNightHours(), false);
 
     layout.add(
+        fireplaceAirOverpressureCheckBox,
+        fireplaceAirOverpressureLevelField,
         humidityAlertCheckBox,
         airExchangeCheckBox,
         airHeatingCheckBox,

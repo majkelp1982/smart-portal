@@ -35,7 +35,8 @@ public class ValueContainer {
                       .format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                       .toString();
               component.setValue(strValue);
-            } else if (path.contains("pressure") || path.contains("temp")) {
+            } else if (!(value instanceof Enum)
+                && (path.contains("pressure") || path.contains("temp"))) {
               final double roundOff =
                   (double) Math.round(Double.parseDouble(value.toString()) * 100) / 100;
               component.setValue(String.valueOf(roundOff));

@@ -18,29 +18,33 @@ public class OverviewTab {
   public VerticalLayout get() {
     final VerticalLayout overviewTab = new VerticalLayout();
     final HorizontalLayout fanAndActors = new HorizontalLayout();
-    fanAndActors.add(createFanTile(), pumpAirConThrottle());
+    fanAndActors.add(createFanTile(), modes());
     overviewTab.add(fanAndActors, airExchangerLayout(), forcedAirLayout());
     return overviewTab;
   }
 
-  private Tile pumpAirConThrottle() {
+  private Tile modes() {
     final Tile tile = new Tile("recu.svg", new Label("Actors"));
 
     final Info circuitPump = new Info("circuit pump");
     ColorPredicates.assignOnOffState(circuitPump);
     final Info airCondition = new Info("airCondition");
     ColorPredicates.assignOnOffState(airCondition);
+    final Info fireplaceAirOverpressureActive = new Info("fireplace");
+    ColorPredicates.assignOnOffState(fireplaceAirOverpressureActive);
     final Info intakeCurrent = new Info("intake current");
     final Info intakeGoal = new Info("intake goal");
     tile.getDetailsContainer()
         .add(
             circuitPump.getLayout(),
             airCondition.getLayout(),
+            fireplaceAirOverpressureActive.getLayout(),
             intakeCurrent.getLayout(),
             intakeGoal.getLayout());
 
     valueContainer.put("circuitPump", circuitPump);
     valueContainer.put("airCondition", airCondition);
+    valueContainer.put("fireplaceAirOverpressureActive", fireplaceAirOverpressureActive);
     valueContainer.put("intakeThrottle.currentPosition", intakeCurrent);
     valueContainer.put("intakeThrottle.goalPosition", intakeGoal);
     return tile;
