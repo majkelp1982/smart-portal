@@ -12,7 +12,7 @@ import com.vaadin.flow.router.Route;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.components.ValueContainer;
-import pl.smarthouse.service.GuiService;
+import pl.smarthouse.module.ModuleService;
 import pl.smarthouse.service.ParamsService;
 import pl.smarthouse.service.WebService;
 import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleDto;
@@ -32,7 +32,7 @@ public class FireplaceView extends VerticalLayout {
   TabSheet tabs;
 
   public FireplaceView(
-      @Autowired final GuiService guiService,
+      @Autowired final ModuleService moduleService,
       @Autowired final ParamsService paramsService,
       @Autowired final WebService webService) {
 
@@ -40,7 +40,7 @@ public class FireplaceView extends VerticalLayout {
     this.webService = webService;
     fireplaceModuleDto =
         (FireplaceModuleDto)
-            guiService.getModuleDtos().stream()
+            moduleService.getModuleDtos().stream()
                 .filter(moduleDto -> moduleDto.getModuleName().contains("FIREPLACE"))
                 .findFirst()
                 .get();

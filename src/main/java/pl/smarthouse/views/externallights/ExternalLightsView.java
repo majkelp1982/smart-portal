@@ -12,7 +12,7 @@ import com.vaadin.flow.router.Route;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.components.ValueContainer;
-import pl.smarthouse.service.GuiService;
+import pl.smarthouse.module.ModuleService;
 import pl.smarthouse.service.ParamsService;
 import pl.smarthouse.service.WebService;
 import pl.smarthouse.sharedobjects.dto.externallights.ExternalLightsModuleDto;
@@ -32,7 +32,7 @@ public class ExternalLightsView extends VerticalLayout {
   TabSheet tabs;
 
   public ExternalLightsView(
-      @Autowired final GuiService guiService,
+      @Autowired final ModuleService moduleService,
       @Autowired final ParamsService paramsService,
       @Autowired final WebService webService) {
 
@@ -40,7 +40,7 @@ public class ExternalLightsView extends VerticalLayout {
     this.webService = webService;
     externalLightsModuleDto =
         (ExternalLightsModuleDto)
-            guiService.getModuleDtos().stream()
+            moduleService.getModuleDtos().stream()
                 .filter(moduleDto -> moduleDto.getModuleName().contains("EXTERNAL_LIGHTS"))
                 .findFirst()
                 .get();
