@@ -14,7 +14,7 @@ import pl.smarthouse.components.Label;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
 import pl.smarthouse.components.tiles.Bme280Tile;
-import pl.smarthouse.service.GuiService;
+import pl.smarthouse.module.ModuleService;
 import pl.smarthouse.sharedobjects.dto.weather.WeatherModuleDto;
 import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.utils.ColorPredicates;
@@ -26,10 +26,10 @@ public class WeatherView extends VerticalLayout {
   private final ValueContainer valueContainer;
   private final WeatherModuleDto weatherModuleDto;
 
-  public WeatherView(@Autowired final GuiService guiService) {
+  public WeatherView(@Autowired final ModuleService moduleService) {
     weatherModuleDto =
         (WeatherModuleDto)
-            guiService.getModuleDtos().stream()
+            moduleService.getModuleDtos().stream()
                 .filter(moduleDto -> moduleDto.getModuleName().contains("WEATHER"))
                 .findFirst()
                 .get();

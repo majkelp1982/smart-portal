@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.module.ModuleService;
 import pl.smarthouse.repository.ModuleRepository;
 import reactor.core.publisher.Flux;
 
@@ -34,7 +35,7 @@ public class ChartService {
       ZonedDateTime.now().getOffset().getTotalSeconds();
   private static final int FIX_DATETIME_OFFSET_IN_HOURS = 2;
   final Map<String, Set<String>> selectedItemsMap = new ConcurrentHashMap<>();
-  private final GuiService guiService;
+  private final ModuleService moduleService;
   private final ModuleRepository moduleRepository;
   private final Map<String, MultiSelectListBox> multiSelectListsMap = new ConcurrentHashMap<>();
 
@@ -193,7 +194,7 @@ public class ChartService {
   }
 
   public Flux<Map<String, List<String>>> getFieldsMapFromModules() {
-    return Flux.fromIterable(guiService.getModuleDtos())
+    return Flux.fromIterable(moduleService.getModuleDtos())
         .parallel()
         .map(moduleDto -> moduleDto.getModuleName().toLowerCase())
         .doOnNext(moduleName -> log.info("Query module name: {}", moduleName))

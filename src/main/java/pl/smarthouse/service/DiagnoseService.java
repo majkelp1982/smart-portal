@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.model.diagnostic.ErrorPredictionDiagnostic;
+import pl.smarthouse.module.ModuleService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -19,14 +20,14 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class DiagnoseService {
   private static final String WAITING_FOR_MODULE_RESPONSE = "WAITING FOR MODULE RESPONSE";
-  private final GuiService guiService;
+  private final ModuleService moduleService;
   private final WebService webService;
   private final ErrorHandlingService errorHandlingService;
   private final List<ErrorPredictionDiagnostic> errors = new ArrayList<>();
 
   public Flux<List<ErrorPredictionDiagnostic>> updateModulesErrors() {
     initModuleErrors();
-    return Flux.fromStream(guiService.getModuleDtos().stream())
+    return Flux.fromStream(moduleService.getModuleDtos().stream())
         .flatMap(
             moduleDto ->
                 webService
@@ -77,7 +78,7 @@ public class DiagnoseService {
   }
 
   public void acknowledgeAllPending() {
-    Flux.fromStream(guiService.getModuleDtos().stream())
+    Flux.fromStream(moduleService.getModuleDtos().stream())
         .doOnNext(
             moduleDto ->
                 log.info(
@@ -135,7 +136,7 @@ public class DiagnoseService {
   }
 
   private void initModuleErrors() {
-    guiService.getModuleDtos().stream()
+    moduleService.getModuleDtos().stream()
         .map(moduleDto -> createInitModuleError(moduleDto.getModuleName()))
         .forEach(
             errorPredictionDiagnostic ->

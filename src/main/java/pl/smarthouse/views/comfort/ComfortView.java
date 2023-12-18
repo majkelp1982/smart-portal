@@ -18,7 +18,7 @@ import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Label;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
-import pl.smarthouse.service.GuiService;
+import pl.smarthouse.module.ModuleService;
 import pl.smarthouse.service.ParamsService;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
@@ -36,7 +36,7 @@ import pl.smarthouse.views.utils.ColorPredicates;
 @Slf4j
 public class ComfortView extends VerticalLayout {
   final List<HorizontalLayout> horizontalOverviewTiles = new ArrayList<>();
-  private final GuiService guiService;
+  private final ModuleService moduleService;
   private final ParamsService paramsService;
   private final HashMap<String, ValueContainer> valueContainerMap = new HashMap<>();
   private final Map<String, ComfortModuleParamsDto> comfortModuleParamsDto = new HashMap<>();
@@ -44,8 +44,8 @@ public class ComfortView extends VerticalLayout {
   VerticalLayout overviewTab = new VerticalLayout();
 
   public ComfortView(
-      @Autowired final GuiService guiService, @Autowired final ParamsService paramsService) {
-    this.guiService = guiService;
+      @Autowired final ModuleService moduleService, @Autowired final ParamsService paramsService) {
+    this.moduleService = moduleService;
     this.paramsService = paramsService;
     createView();
     UI.getCurrent()
@@ -74,7 +74,7 @@ public class ComfortView extends VerticalLayout {
     tabs.add("Overview", overviewTab);
     add(tabs);
 
-    guiService.getModuleDtos().stream()
+    moduleService.getModuleDtos().stream()
         .filter(moduleDto -> moduleDto.getModuleName().contains("COMFORT"))
         .sorted(Comparator.comparing(ModuleDto::getModuleName))
         .map(moduleDto -> (ComfortModuleDto) moduleDto)

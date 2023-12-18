@@ -12,7 +12,7 @@ import com.vaadin.flow.router.Route;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.components.ValueContainer;
-import pl.smarthouse.service.GuiService;
+import pl.smarthouse.module.ModuleService;
 import pl.smarthouse.service.ParamsService;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;
@@ -31,12 +31,12 @@ public class VentilationView extends VerticalLayout {
   TabSheet tabs;
 
   public VentilationView(
-      @Autowired final GuiService guiService, @Autowired final ParamsService paramsService) {
+      @Autowired final ModuleService moduleService, @Autowired final ParamsService paramsService) {
 
     this.paramsService = paramsService;
     ventModuleDto =
         (VentModuleDto)
-            guiService.getModuleDtos().stream()
+            moduleService.getModuleDtos().stream()
                 .filter(moduleDto -> moduleDto.getModuleName().contains("VENTILATION"))
                 .findFirst()
                 .get();
