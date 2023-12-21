@@ -1,5 +1,6 @@
 package pl.smarthouse.module;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.core.Ds18b20ResultDto;
@@ -10,6 +11,7 @@ import pl.smarthouse.sharedobjects.dto.fireplace.enums.State;
 import pl.smarthouse.utils.CreatorUtils;
 
 @Component
+@RequiredArgsConstructor
 public class FireplaceModuleCreator extends ModuleCreator {
 
   @Override

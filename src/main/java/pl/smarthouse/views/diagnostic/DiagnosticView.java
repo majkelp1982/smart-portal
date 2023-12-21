@@ -8,17 +8,25 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.model.diagnostic.ErrorPredictionDiagnostic;
+import pl.smarthouse.model.diagnostic.ModuleDetails;
 import pl.smarthouse.service.DiagnoseService;
 import pl.smarthouse.service.ErrorHandlingService;
 import pl.smarthouse.views.MainView;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @PageTitle("Smart Portal | Diagnostic")
 @Route(value = "Diagnostic", layout = MainView.class)
@@ -27,7 +35,9 @@ public class DiagnosticView extends VerticalLayout {
   private final DiagnoseService diagnoseService;
   private final ErrorHandlingService errorHandlingService;
   private final Grid<ErrorPredictionDiagnostic> errorsGrid = new Grid<>();
+  private final Grid<ModuleDetails> moduleDetailsGrid = new Grid<>();
   private final Label totalErrorCountLabel = new Label();
+  private List<ModuleDetails> modulesDetails;
 
   public DiagnosticView(
       @Autowired final DiagnoseService diagnoseService,
@@ -35,18 +45,32 @@ public class DiagnosticView extends VerticalLayout {
     this.diagnoseService = diagnoseService;
     this.errorHandlingService = errorHandlingService;
     createView();
-    refreshErrors();
+    refreshErrors().blockLast();
+    refreshModuleDetails().block();
     errorsGrid.setItems(diagnoseService.getErrors());
+    moduleDetailsGrid.setItems(modulesDetails);
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
               log.info("Pool listener triggered for class: {}", this.getClass().toString());
-              refreshErrors();
+              refreshErrors().subscribe();
+              refreshModuleDetails().subscribe();
             });
   }
 
-  private void refreshErrors() {
-    this.diagnoseService
+  private Mono<List<ModuleDetails>> refreshModuleDetails() {
+    return diagnoseService
+        .getModulesDetails()
+        .collectList()
+        .doOnNext(moduleDetails -> modulesDetails = moduleDetails)
+        .doOnNext(
+            moduleDetails ->
+                getUI()
+                    .ifPresent(ui -> ui.access(() -> moduleDetailsGrid.setItems(moduleDetails))));
+  }
+
+  private Flux<List<ErrorPredictionDiagnostic>> refreshErrors() {
+    return this.diagnoseService
         .updateModulesErrors()
         .doOnNext(
             errors -> {
@@ -61,14 +85,13 @@ public class DiagnosticView extends VerticalLayout {
                                 totalErrorCountLabel.setText("Total error: " + errors.size());
                               }));
             })
-        .doOnSubscribe(subscription -> log.info("Refreshing module errors"))
-        .subscribe();
+        .doOnSubscribe(subscription -> log.info("Refreshing module errors"));
   }
 
   @Override
   protected void onAttach(final AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    UI.getCurrent().setPollInterval(60000);
+    UI.getCurrent().setPollInterval(15000);
   }
 
   @Override
@@ -79,8 +102,9 @@ public class DiagnosticView extends VerticalLayout {
 
   private void createView() {
     final HorizontalLayout topLayout = prepareTopLayout();
-    prepareGrid();
-    add(topLayout, errorsGrid);
+    prepareErrorGrid();
+    prepareModuleDetailsGrid();
+    add(topLayout, errorsGrid, moduleDetailsGrid);
   }
 
   private HorizontalLayout prepareTopLayout() {
@@ -95,8 +119,11 @@ public class DiagnosticView extends VerticalLayout {
     return layout;
   }
 
-  private void prepareGrid() {
-    errorsGrid.addColumn(ErrorPredictionDiagnostic::getModuleName).setHeader("Module");
+  private void prepareErrorGrid() {
+    errorsGrid
+        .addColumn(ErrorPredictionDiagnostic::getModuleName)
+        .setKey("Module")
+        .setHeader("Module");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getMessage).setHeader("Message");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getPriority).setHeader("Prio");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getBeginTimeString).setHeader("Begin");
@@ -114,5 +141,79 @@ public class DiagnosticView extends VerticalLayout {
     errorsGrid.setAllRowsVisible(true);
     errorsGrid.setMultiSort(true);
     errorsGrid.recalculateColumnWidths();
+    errorsGrid.sort(
+        Collections.singletonList(
+            new GridSortOrder<>(errorsGrid.getColumnByKey("Module"), SortDirection.ASCENDING)));
+  }
+
+  private void prepareModuleDetailsGrid() {
+    moduleDetailsGrid.addColumn(ModuleDetails::getModuleType).setKey("Module").setHeader("Module");
+    moduleDetailsGrid
+        .addColumn(
+            new ComponentRenderer<>(
+                moduleDetails -> {
+                  final HorizontalLayout layout = new HorizontalLayout();
+                  final Button button =
+                      new Button(
+                          "Port: "
+                              + moduleDetails
+                                  .getServiceAddress()
+                                  .substring(moduleDetails.getServiceAddress().indexOf(":")));
+                  button.addClickListener(
+                      buttonClickEvent -> {
+                        UI.getCurrent()
+                            .getPage()
+                            .executeJs(
+                                "window.open('http://"
+                                    + moduleDetails.getServiceAddress()
+                                    + "/swagger-ui.html', '_blank');");
+                      });
+                  layout.add(button);
+                  return layout;
+                }))
+        .setHeader("Swagger");
+    moduleDetailsGrid
+        .addColumn(
+            new ComponentRenderer<>(
+                moduleDetails -> {
+                  final HorizontalLayout layout = new HorizontalLayout();
+                  final Button button = new Button(moduleDetails.getModuleIpAddress());
+                  button.addClickListener(
+                      buttonClickEvent -> {
+                        UI.getCurrent()
+                            .getPage()
+                            .executeJs(
+                                "window.open('http://"
+                                    + moduleDetails.getModuleIpAddress()
+                                    + "', '_blank');");
+                      });
+                  layout.add(button);
+                  return layout;
+                }))
+        .setHeader("Module");
+    moduleDetailsGrid.addColumn(ModuleDetails::getFirmware).setHeader("Firmware");
+    moduleDetailsGrid.addColumn(ModuleDetails::getReconnectCount).setHeader("Reconnect");
+    moduleDetailsGrid
+        .addColumn(ModuleDetails::getModuleLastUpdateInSec)
+        .setHeader("Module last update [s]");
+    moduleDetailsGrid
+        .addColumn(ModuleDetails::getServiceLastUpdateInSec)
+        .setHeader("Service last update [s]");
+    moduleDetailsGrid
+        .getColumns()
+        .forEach(
+            column -> {
+              column.setResizable(true);
+              column.setSortable(true);
+              column.setAutoWidth(true);
+            });
+    moduleDetailsGrid.setPageSize(1000);
+    moduleDetailsGrid.setAllRowsVisible(true);
+    moduleDetailsGrid.setMultiSort(true);
+    moduleDetailsGrid.recalculateColumnWidths();
+    moduleDetailsGrid.sort(
+        Collections.singletonList(
+            new GridSortOrder<>(
+                moduleDetailsGrid.getColumnByKey("Module"), SortDirection.ASCENDING)));
   }
 }

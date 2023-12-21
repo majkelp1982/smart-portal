@@ -1,5 +1,6 @@
 package pl.smarthouse.module;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.core.RdbDimmerResponseDto;
@@ -7,6 +8,7 @@ import pl.smarthouse.sharedobjects.dto.externallights.ExternalLightsModuleDto;
 import pl.smarthouse.sharedobjects.dto.externallights.core.LightZoneDto;
 
 @Component
+@RequiredArgsConstructor
 public class ExternalLightsModuleCreator extends ModuleCreator {
 
   @Override

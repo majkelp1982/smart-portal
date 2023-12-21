@@ -1,11 +1,13 @@
 package pl.smarthouse.module;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
 import pl.smarthouse.sharedobjects.dto.core.Bme280ResponseDto;
 
 @Component
+@RequiredArgsConstructor
 public class ComfortModuleCreator extends ModuleCreator {
 
   @Override

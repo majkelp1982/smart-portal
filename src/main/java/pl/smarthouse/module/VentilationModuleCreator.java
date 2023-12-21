@@ -3,6 +3,7 @@ package pl.smarthouse.module;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.core.Bme280ResponseDto;
@@ -14,6 +15,7 @@ import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.utils.CreatorUtils;
 
 @Component
+@RequiredArgsConstructor
 public class VentilationModuleCreator extends ModuleCreator {
 
   @Override

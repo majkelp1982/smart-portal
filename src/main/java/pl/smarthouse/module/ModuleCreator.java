@@ -1,10 +1,10 @@
 package pl.smarthouse.module;
 
 import java.time.LocalDateTime;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 
-@NoArgsConstructor
+@RequiredArgsConstructor
 public abstract class ModuleCreator {
   public abstract ModuleDto createBaseModel();
 
@@ -42,8 +42,8 @@ public abstract class ModuleCreator {
               updateObjectClassName, getModuleCreatorType()));
     }
   }
-  
+
   private String formatModuleCreatorTypeName(final ModuleCreatorType moduleCreatorType) {
-    return moduleCreatorType.toString().replace("_","").toUpperCase();
+    return moduleCreatorType.toString().replace("_", "").toUpperCase();
   }
 }

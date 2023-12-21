@@ -1,5 +1,6 @@
 package pl.smarthouse.module;
 
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.exceptions.ModuleCreatorException;
 import pl.smarthouse.properties.ModuleManagerProperties;
 import pl.smarthouse.service.WebService;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
@@ -32,7 +34,16 @@ public class ModuleService implements ApplicationListener<ApplicationStartedEven
   private void initializeModels() {
     webService
         .get(moduleManagerProperties.getURL() + "/all", SettingsDto.class)
-        .filter(settingsDto -> !settingsDto.getType().isEmpty())
+        .filter(
+            settingsDto ->
+                Arrays.stream(ModuleCreatorType.values())
+                    .anyMatch(
+                        moduleCreatorType ->
+                            settingsDto.getType().contains(moduleCreatorType.toString())))
+        .doOnDiscard(
+            SettingsDto.class,
+            discardedElement ->
+                log.error("For type: {}, no module creator is defined", discardedElement.getType()))
         .doOnNext(this::createModel)
         .subscribe();
   }
@@ -50,7 +61,10 @@ public class ModuleService implements ApplicationListener<ApplicationStartedEven
     return moduleCreators.stream()
         .filter(moduleCreator -> type.contains(moduleCreator.getModuleCreatorType().toString()))
         .findFirst()
-        .orElseThrow();
+        .orElseThrow(
+            () ->
+                new ModuleCreatorException(
+                    String.format("Module creator for type: %s not found", type)));
   }
 
   @Scheduled(fixedDelay = 5000)
