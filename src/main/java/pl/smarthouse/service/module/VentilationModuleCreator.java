@@ -1,4 +1,4 @@
-package pl.smarthouse.module;
+package pl.smarthouse.service.module;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

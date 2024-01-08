@@ -1,4 +1,4 @@
-package pl.smarthouse.module;
+package pl.smarthouse.service.module;
 
 public enum ModuleCreatorType {
   VENTILATION,

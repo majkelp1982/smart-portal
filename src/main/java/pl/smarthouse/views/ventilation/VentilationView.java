@@ -12,7 +12,7 @@ import com.vaadin.flow.router.Route;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.components.ValueContainer;
-import pl.smarthouse.module.ModuleService;
+import pl.smarthouse.service.module.ModuleService;
 import pl.smarthouse.service.ParamsService;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;

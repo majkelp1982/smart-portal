@@ -20,8 +20,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.smarthouse.module.ModuleService;
 import pl.smarthouse.repository.ModuleRepository;
+import pl.smarthouse.service.module.ModuleService;
 import reactor.core.publisher.Flux;
 
 @Service

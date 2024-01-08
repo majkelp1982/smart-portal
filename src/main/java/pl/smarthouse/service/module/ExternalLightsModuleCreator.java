@@ -1,4 +1,4 @@
-package pl.smarthouse.module;
+package pl.smarthouse.service.module;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

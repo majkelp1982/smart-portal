@@ -14,7 +14,7 @@ import pl.smarthouse.components.Label;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
 import pl.smarthouse.components.tiles.Bme280Tile;
-import pl.smarthouse.module.ModuleService;
+import pl.smarthouse.service.module.ModuleService;
 import pl.smarthouse.sharedobjects.dto.weather.WeatherModuleDto;
 import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.utils.ColorPredicates;
