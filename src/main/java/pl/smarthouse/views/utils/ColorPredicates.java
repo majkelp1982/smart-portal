@@ -91,7 +91,7 @@ public class ColorPredicates {
   public void assignToHumidity(final Info info) {
     info.setColorEnabled(true);
     info.addColorPredicates(
-        component -> ((int) component.getValue() < 35 && (int) component.getValue() > 70),
+        component -> ((int) component.getValue() < 35 || (int) component.getValue() > 70),
         ComponentColor.ALARM);
     info.addColorPredicates(
         component -> ((int) component.getValue() >= 35 && (int) component.getValue() <= 70),
