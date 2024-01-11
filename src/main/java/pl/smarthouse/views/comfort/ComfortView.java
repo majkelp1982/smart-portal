@@ -122,12 +122,15 @@ public class ComfortView extends VerticalLayout {
     ColorPredicates.assignToCurrentOperation(currentOperation);
     final Info requiredPower = new Info("power", "%");
     ColorPredicates.assignToRequiredPower(requiredPower);
+    final Info enableTemperatureTimeRangesInfo = new Info("Temp time ranges");
+    ColorPredicates.assignEnableState(enableTemperatureTimeRangesInfo);
     tile.getDetailsContainer()
         .add(
             temperature.getLayout(),
             humidity.getLayout(),
             currentOperation.getLayout(),
-            requiredPower.getLayout());
+            requiredPower.getLayout(),
+            enableTemperatureTimeRangesInfo.getLayout());
 
     // Values
     final ValueContainer valueContainer = new ValueContainer(comfortDto);
@@ -136,6 +139,7 @@ public class ComfortView extends VerticalLayout {
     valueContainer.put("sensorResponse.humidity", humidity);
     valueContainer.put("currentOperation", currentOperation);
     valueContainer.put("requiredPower", requiredPower);
+    valueContainer.put("enableTemperatureTimeRanges", enableTemperatureTimeRangesInfo);
 
     valueContainerMap.put(valueContainerName, valueContainer);
 

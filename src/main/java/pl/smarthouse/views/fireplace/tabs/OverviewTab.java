@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import pl.smarthouse.components.*;
 import pl.smarthouse.components.tiles.Ds18b20Tile;
 import pl.smarthouse.service.WebService;
+import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleDto;
-import pl.smarthouse.sharedobjects.dto.fireplace.enums.State;
 import pl.smarthouse.views.utils.ColorPredicates;
 
 @RequiredArgsConstructor

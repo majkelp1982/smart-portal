@@ -44,5 +44,6 @@ public class ComfortModuleCreator extends ModuleCreator {
     comfortDto.setCurrentOperation(updateObject.getCurrentOperation());
     comfortDto.setRequiredPower(updateObject.getRequiredPower());
     comfortDto.setLeftHoldTimeInMinutes(updateObject.getLeftHoldTimeInMinutes());
+    comfortDto.setEnableTemperatureTimeRanges(updateObject.getEnableTemperatureTimeRanges());
   }
 }

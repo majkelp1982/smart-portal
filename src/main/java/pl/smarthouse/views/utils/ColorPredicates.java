@@ -9,8 +9,8 @@ import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Label;
 import pl.smarthouse.components.PortalComponent;
 import pl.smarthouse.model.ComponentColor;
+import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
-import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.ThrottleState;
 import pl.smarthouse.sharedobjects.enums.Operation;
 
@@ -31,6 +31,14 @@ public class ColorPredicates {
     button.addColorPredicates(
         component -> State.ON.toString().equals(component.getValue().toString()),
         ComponentColor.ON);
+  }
+
+  public void assignEnableState(final Info info) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OK);
+    info.addColorPredicates(
+        component -> State.OFF.toString().equals(component.getValue().toString()),
+        ComponentColor.ALARM);
   }
 
   public void assignTrueFalseState(final Button button) {

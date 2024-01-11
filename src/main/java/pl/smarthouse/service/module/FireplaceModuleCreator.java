@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.core.Ds18b20ResultDto;
+import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleDto;
 import pl.smarthouse.sharedobjects.dto.fireplace.core.Throttle;
 import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
-import pl.smarthouse.sharedobjects.dto.fireplace.enums.State;
 import pl.smarthouse.utils.CreatorUtils;
 
 @Component

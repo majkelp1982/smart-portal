@@ -2,6 +2,7 @@ package pl.smarthouse.views.comfort.subview;
 
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -31,6 +32,12 @@ public class TemperatureControlView {
     requiredTemperatureField.addValueChangeListener(
         event -> temperatureControl.setRequiredTemperature(requiredTemperatureField.getValue()));
 
+    final DatePicker disableTimeRangesUntilDatePicker = new DatePicker();
+    disableTimeRangesUntilDatePicker.setLabel("disable time ranges until");
+    disableTimeRangesUntilDatePicker.setValue(temperatureControl.getDisableTimeRangesUntilDate());
+    disableTimeRangesUntilDatePicker.addValueChangeListener(
+        event -> temperatureControl.setDisableTimeRangesUntilDate(event.getValue()));
+
     final Accordion temperatureControlAccordion = new Accordion();
     temperatureControlAccordion.add(
         "Heating control", heatingControlView(temperatureControl.getHeatingControl()));
@@ -41,7 +48,8 @@ public class TemperatureControlView {
 
     temperatureControlAccordion.close();
 
-    layout.add(requiredTemperatureField, temperatureControlAccordion);
+    layout.add(
+        requiredTemperatureField, disableTimeRangesUntilDatePicker, temperatureControlAccordion);
     accordion.add("Temperature control", layout);
   }
 
