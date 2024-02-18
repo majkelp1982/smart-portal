@@ -17,27 +17,31 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import pl.smarthouse.model.diagnostic.ErrorPredictionDiagnostic;
 import pl.smarthouse.model.diagnostic.ModuleDetails;
 import pl.smarthouse.service.DiagnoseService;
 import pl.smarthouse.service.ErrorHandlingService;
 import pl.smarthouse.views.MainView;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @PageTitle("Smart Portal | Diagnostic")
 @Route(value = "Diagnostic", layout = MainView.class)
 @Slf4j
+@EnableScheduling
 public class DiagnosticView extends VerticalLayout {
   private final DiagnoseService diagnoseService;
   private final ErrorHandlingService errorHandlingService;
   private final Grid<ErrorPredictionDiagnostic> errorsGrid = new Grid<>();
   private final Grid<ModuleDetails> moduleDetailsGrid = new Grid<>();
   private final Label totalErrorCountLabel = new Label();
-  private List<ModuleDetails> modulesDetails;
+  private final Label totalModuleDeatilsCountLabel = new Label();
+  private final Set<ModuleDetails> modulesDetails = new HashSet<>();
 
   public DiagnosticView(
       @Autowired final DiagnoseService diagnoseService,
@@ -45,53 +49,62 @@ public class DiagnosticView extends VerticalLayout {
     this.diagnoseService = diagnoseService;
     this.errorHandlingService = errorHandlingService;
     createView();
-    refreshErrors().blockLast();
-    refreshModuleDetails().block();
-    errorsGrid.setItems(diagnoseService.getErrors());
-    moduleDetailsGrid.setItems(modulesDetails);
-    UI.getCurrent()
-        .addPollListener(
-            pollEvent -> {
-              log.info("Pool listener triggered for class: {}", this.getClass().toString());
-              refreshErrors().subscribe();
-              refreshModuleDetails().subscribe();
-            });
   }
 
-  private Mono<List<ModuleDetails>> refreshModuleDetails() {
-    return diagnoseService
+  @Scheduled(fixedDelay = 10000)
+  private void refreshModuleDetails() {
+    if (!isAttached()) {
+      return;
+    }
+    diagnoseService
         .getModulesDetails()
-        .collectList()
-        .doOnNext(moduleDetails -> modulesDetails = moduleDetails)
+        .doOnNext(modulesDetails::add)
         .doOnNext(
-            moduleDetails ->
+            ignore ->
                 getUI()
-                    .ifPresent(ui -> ui.access(() -> moduleDetailsGrid.setItems(moduleDetails))));
+                    .ifPresent(
+                        ui ->
+                            ui.access(
+                                () -> {
+                                  moduleDetailsGrid.setItems(modulesDetails);
+                                  moduleDetailsGrid.setHeightFull();
+                                  moduleDetailsGrid.setAllRowsVisible(true);
+                                  totalModuleDeatilsCountLabel.setText(
+                                      String.format(
+                                          "Modules: %s/%s",
+                                          modulesDetails.size(), diagnoseService.getModuleCount()));
+                                })))
+        .subscribe();
   }
 
-  private Flux<List<ErrorPredictionDiagnostic>> refreshErrors() {
-    return this.diagnoseService
-        .updateModulesErrors()
-        .doOnNext(
-            errors -> {
-              getUI()
-                  .ifPresent(
-                      ui ->
-                          ui.access(
-                              () -> {
-                                diagnoseService.updateErrors(
-                                    PORTAL_MODULE, errorHandlingService.getErrorPredictions());
-                                errorsGrid.setItems(errors);
-                                totalErrorCountLabel.setText("Total error: " + errors.size());
-                              }));
-            })
-        .doOnSubscribe(subscription -> log.info("Refreshing module errors"));
+  @Scheduled(fixedDelay = 10000)
+  private void refreshErrorDetails() {
+    if (!isAttached()) {
+      return;
+    }
+    diagnoseService.updateModulesErrors().subscribe();
+    getUI()
+        .ifPresent(
+            ui ->
+                ui.access(
+                    () -> {
+                      diagnoseService.updateErrors(
+                          PORTAL_MODULE, errorHandlingService.getErrorPredictions());
+                      final List<ErrorPredictionDiagnostic> errors = diagnoseService.getErrors();
+                      errorsGrid.setItems(errors);
+                      errorsGrid.setHeightFull();
+                      errorsGrid.setAllRowsVisible(true);
+                      totalErrorCountLabel.setText("Total error: " + errors.size());
+                    }));
   }
 
   @Override
   protected void onAttach(final AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    UI.getCurrent().setPollInterval(15000);
+    UI.getCurrent().setPollInterval(5000);
+    diagnoseService.initModuleErrors();
+    refreshErrorDetails();
+    refreshModuleDetails();
   }
 
   @Override
@@ -101,13 +114,16 @@ public class DiagnosticView extends VerticalLayout {
   }
 
   private void createView() {
-    final HorizontalLayout topLayout = prepareTopLayout();
-    prepareErrorGrid();
-    prepareModuleDetailsGrid();
-    add(topLayout, errorsGrid, moduleDetailsGrid);
+    add(createErrorLayout(), createModuleDetailLayout());
   }
 
-  private HorizontalLayout prepareTopLayout() {
+  private VerticalLayout createErrorLayout() {
+    final HorizontalLayout topLayout = prepareErrorTopLayout();
+    prepareErrorGrid();
+    return new VerticalLayout(topLayout, errorsGrid);
+  }
+
+  private HorizontalLayout prepareErrorTopLayout() {
     final HorizontalLayout layout = new HorizontalLayout();
     final Button acknowledgeAllPendingButton = new Button("Acknowledge all pending");
     acknowledgeAllPendingButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
@@ -144,6 +160,27 @@ public class DiagnosticView extends VerticalLayout {
     errorsGrid.sort(
         Collections.singletonList(
             new GridSortOrder<>(errorsGrid.getColumnByKey("Module"), SortDirection.ASCENDING)));
+  }
+
+  private VerticalLayout createModuleDetailLayout() {
+    final HorizontalLayout topLayout = prepareModuleDetailTopLayout();
+    prepareModuleDetailsGrid();
+    return new VerticalLayout(topLayout, moduleDetailsGrid);
+  }
+
+  private HorizontalLayout prepareModuleDetailTopLayout() {
+    final HorizontalLayout layout = new HorizontalLayout();
+    final Button restartAllModulesButton = new Button("Restart all modules");
+    restartAllModulesButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+    restartAllModulesButton.addClickListener(
+        event -> {
+          modulesDetails.stream()
+              .map(ModuleDetails::getModuleIpAddress)
+              .forEach(diagnoseService::restartModule);
+        });
+
+    layout.add(restartAllModulesButton, totalModuleDeatilsCountLabel);
+    return layout;
   }
 
   private void prepareModuleDetailsGrid() {

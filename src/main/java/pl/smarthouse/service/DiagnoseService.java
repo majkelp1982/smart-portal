@@ -46,6 +46,10 @@ public class DiagnoseService {
         .sequential();
   }
 
+  public int getModuleCount() {
+    return moduleService.getModuleDtos().size();
+  }
+
   private ModuleDetails enrichWithModuleSettings(
       final SettingsDto settingsDto, final ModuleDetails moduleDetails) {
     moduleDetails.setServiceAddress(settingsDto.getServiceAddress());
@@ -74,8 +78,11 @@ public class DiagnoseService {
         .map(settingsDtos -> settingsDtos.get(0));
   }
 
+  public void restartModule(final String moduleIpAddress) {
+    webService.get(moduleIpAddress + "/restart", String.class).subscribe();
+  }
+
   public Flux<List<ErrorPredictionDiagnostic>> updateModulesErrors() {
-    initModuleErrors();
     return Flux.fromStream(moduleService.getModuleDtos().stream())
         .parallel()
         .flatMap(
@@ -111,8 +118,9 @@ public class DiagnoseService {
                     .doOnNext(
                         list ->
                             log.info(
-                                "Updating errors. Module: {}, list size: {}",
+                                "Updating errors. Module: {}, list size: {}, total: {}",
                                 moduleDto.getModuleName(),
+                                list.size(),
                                 errors.size()))
                     .map(
                         errorPredictionsDiagnostic ->
@@ -186,7 +194,7 @@ public class DiagnoseService {
     return errors;
   }
 
-  private void initModuleErrors() {
+  public void initModuleErrors() {
     moduleService.getModuleDtos().stream()
         .map(moduleDto -> createInitModuleError(moduleDto.getModuleName()))
         .forEach(

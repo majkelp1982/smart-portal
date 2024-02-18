@@ -2,6 +2,7 @@ package pl.smarthouse.model.diagnostic;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,5 +25,22 @@ public class ModuleDetails {
 
   public Long getModuleLastUpdateInSec() {
     return Duration.between(moduleUpdateTimestamp, LocalDateTime.now()).toSeconds();
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final ModuleDetails that = (ModuleDetails) o;
+    return moduleType.equals(that.moduleType);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(moduleType);
   }
 }
