@@ -1,5 +1,6 @@
 package pl.smarthouse.views.diagnostic;
 
+import static pl.smarthouse.service.DiagnoseService.WAITING;
 import static pl.smarthouse.service.DiagnoseService.WAITING_FOR_MODULE_RESPONSE;
 import static pl.smarthouse.service.ErrorHandlingService.PORTAL_MODULE;
 
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -98,6 +100,9 @@ public class DiagnosticView extends VerticalLayout {
   }
 
   private void updateModulesDetails(final ModuleDetails moduleDetails) {
+    if (StringUtil.isBlank(moduleDetails.getModuleType())) {
+      return;
+    }
     modulesDetails.remove(moduleDetails);
     modulesDetails.add(moduleDetails);
   }
@@ -234,6 +239,7 @@ public class DiagnosticView extends VerticalLayout {
         event -> {
           modulesDetails.stream()
               .map(ModuleDetails::getModuleIpAddress)
+              .filter(moduleIpAddress -> !moduleIpAddress.equals(WAITING))
               .forEach(diagnoseService::restartModule);
         });
 

@@ -26,6 +26,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class DiagnoseService {
   public static final String WAITING_FOR_MODULE_RESPONSE = "WAITING FOR MODULE RESPONSE";
+  public static final String WAITING = "WAITING...";
   private final ModuleManagerProperties moduleManagerProperties;
   private final ModuleService moduleService;
   private final WebService webService;
@@ -44,8 +45,23 @@ public class DiagnoseService {
                             getModuleParams(settingsDto)
                                 .map(
                                     moduleDetails ->
-                                        enrichWithModuleSettings(settingsDto, moduleDetails))))
+                                        enrichWithModuleSettings(settingsDto, moduleDetails)))
+                    .onErrorResume(
+                        throwable ->
+                            Mono.justOrEmpty(createModuleDetailsWaiting(moduleDto.getModuleName()))))
         .sequential();
+  }
+
+  private ModuleDetails createModuleDetailsWaiting(final String moduleName) {
+    final ModuleDetails moduleDetailsWaiting = new ModuleDetails();
+    moduleDetailsWaiting.setModuleType(moduleName);
+    moduleDetailsWaiting.setServiceAddress(WAITING);
+    moduleDetailsWaiting.setServiceUpdateTimestamp(LocalDateTime.now());
+    moduleDetailsWaiting.setModuleIpAddress(WAITING);
+    moduleDetailsWaiting.setModuleUpdateTimestamp(LocalDateTime.now());
+    moduleDetailsWaiting.setFirmware(WAITING);
+    moduleDetailsWaiting.setReconnectCount(0);
+    return moduleDetailsWaiting;
   }
 
   public int getModuleCount() {
