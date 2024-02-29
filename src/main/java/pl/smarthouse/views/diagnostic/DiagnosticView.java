@@ -1,5 +1,6 @@
 package pl.smarthouse.views.diagnostic;
 
+import static pl.smarthouse.service.DiagnoseService.WAITING_FOR_MODULE_RESPONSE;
 import static pl.smarthouse.service.ErrorHandlingService.PORTAL_MODULE;
 
 import com.vaadin.flow.component.AttachEvent;
@@ -15,7 +16,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -24,16 +27,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import pl.smarthouse.model.ComponentColor;
 import pl.smarthouse.model.diagnostic.ErrorPredictionDiagnostic;
 import pl.smarthouse.model.diagnostic.ModuleDetails;
 import pl.smarthouse.service.DiagnoseService;
 import pl.smarthouse.service.ErrorHandlingService;
+import pl.smarthouse.service.FirmwareUploadService;
 import pl.smarthouse.views.MainView;
 
 @PageTitle("Smart Portal | Diagnostic")
 @Route(value = "Diagnostic", layout = MainView.class)
 @Slf4j
 @EnableScheduling
+@PreserveOnRefresh
 public class DiagnosticView extends VerticalLayout {
   private final DiagnoseService diagnoseService;
   private final ErrorHandlingService errorHandlingService;
@@ -42,12 +48,15 @@ public class DiagnosticView extends VerticalLayout {
   private final Label totalErrorCountLabel = new Label();
   private final Label totalModuleDeatilsCountLabel = new Label();
   private final Set<ModuleDetails> modulesDetails = new HashSet<>();
+  private final FirmwareUploadService firmwareUploadService;
 
   public DiagnosticView(
       @Autowired final DiagnoseService diagnoseService,
-      @Autowired final ErrorHandlingService errorHandlingService) {
+      @Autowired final ErrorHandlingService errorHandlingService,
+      @Autowired final FirmwareUploadService firmwareUploadService) {
     this.diagnoseService = diagnoseService;
     this.errorHandlingService = errorHandlingService;
+    this.firmwareUploadService = firmwareUploadService;
     createView();
   }
 
@@ -69,6 +78,16 @@ public class DiagnosticView extends VerticalLayout {
                                   moduleDetailsGrid.setItems(modulesDetails);
                                   moduleDetailsGrid.setHeightFull();
                                   moduleDetailsGrid.setAllRowsVisible(true);
+                                  totalModuleDeatilsCountLabel.getStyle().set("margin", "auto");
+                                  if (modulesDetails.size() != diagnoseService.getModuleCount()) {
+                                    totalModuleDeatilsCountLabel
+                                        .getStyle()
+                                        .set("color", ComponentColor.ALARM.value);
+                                  } else {
+                                    totalModuleDeatilsCountLabel
+                                        .getStyle()
+                                        .set("color", ComponentColor.OK.value);
+                                  }
                                   totalModuleDeatilsCountLabel.setText(
                                       String.format(
                                           "Modules: %s/%s",
@@ -94,7 +113,28 @@ public class DiagnosticView extends VerticalLayout {
                       errorsGrid.setItems(errors);
                       errorsGrid.setHeightFull();
                       errorsGrid.setAllRowsVisible(true);
-                      totalErrorCountLabel.setText("Total error: " + errors.size());
+                      totalErrorCountLabel.getStyle().set("margin", "auto");
+                      final List<String> awaitingResponseModules =
+                          errors.stream()
+                              .filter(
+                                  errorPredictionDiagnostic ->
+                                      WAITING_FOR_MODULE_RESPONSE.equals(
+                                          errorPredictionDiagnostic.getMessage()))
+                              .map(ErrorPredictionDiagnostic::getModuleName)
+                              .toList();
+                      if (!awaitingResponseModules.isEmpty()) {
+                        totalErrorCountLabel.setText(
+                            String.format(
+                                "Modules awaiting response: %s", awaitingResponseModules));
+                        totalErrorCountLabel.getStyle().set("color", ComponentColor.ALARM.value);
+                      } else if (errors.isEmpty()) {
+                        totalErrorCountLabel.getStyle().set("color", ComponentColor.OK.value);
+                        totalErrorCountLabel.setText("No errors found");
+                      } else {
+                        totalErrorCountLabel.getStyle().set("color", ComponentColor.ALARM.value);
+                        totalErrorCountLabel.setText(
+                            String.format("Total errors found: %s", errors.size()));
+                      }
                     }));
   }
 

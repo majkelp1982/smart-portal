@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class DiagnoseService {
-  private static final String WAITING_FOR_MODULE_RESPONSE = "WAITING FOR MODULE RESPONSE";
+  public static final String WAITING_FOR_MODULE_RESPONSE = "WAITING FOR MODULE RESPONSE";
   private final ModuleManagerProperties moduleManagerProperties;
   private final ModuleService moduleService;
   private final WebService webService;
