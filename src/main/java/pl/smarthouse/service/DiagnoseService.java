@@ -48,7 +48,8 @@ public class DiagnoseService {
                                         enrichWithModuleSettings(settingsDto, moduleDetails)))
                     .onErrorResume(
                         throwable ->
-                            Mono.justOrEmpty(createModuleDetailsWaiting(moduleDto.getModuleName()))))
+                            Mono.justOrEmpty(
+                                createModuleDetailsWaiting(moduleDto.getModuleName()))))
         .sequential();
   }
 
