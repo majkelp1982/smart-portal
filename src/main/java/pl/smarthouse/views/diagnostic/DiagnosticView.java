@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -67,7 +68,7 @@ public class DiagnosticView extends VerticalLayout {
     }
     diagnoseService
         .getModulesDetails()
-        .doOnNext(modulesDetails::add)
+        .doOnNext(this::updateModulesDetails)
         .doOnNext(
             ignore ->
                 getUI()
@@ -96,46 +97,63 @@ public class DiagnosticView extends VerticalLayout {
         .subscribe();
   }
 
+  private void updateModulesDetails(final ModuleDetails moduleDetails) {
+    modulesDetails.remove(moduleDetails);
+    modulesDetails.add(moduleDetails);
+  }
+
   @Scheduled(fixedDelay = 10000)
   private void refreshErrorDetails() {
     if (!isAttached()) {
       return;
     }
-    diagnoseService.updateModulesErrors().subscribe();
-    getUI()
-        .ifPresent(
-            ui ->
-                ui.access(
-                    () -> {
-                      diagnoseService.updateErrors(
-                          PORTAL_MODULE, errorHandlingService.getErrorPredictions());
-                      final List<ErrorPredictionDiagnostic> errors = diagnoseService.getErrors();
-                      errorsGrid.setItems(errors);
-                      errorsGrid.setHeightFull();
-                      errorsGrid.setAllRowsVisible(true);
-                      totalErrorCountLabel.getStyle().set("margin", "auto");
-                      final List<String> awaitingResponseModules =
-                          errors.stream()
-                              .filter(
-                                  errorPredictionDiagnostic ->
-                                      WAITING_FOR_MODULE_RESPONSE.equals(
-                                          errorPredictionDiagnostic.getMessage()))
-                              .map(ErrorPredictionDiagnostic::getModuleName)
-                              .toList();
-                      if (!awaitingResponseModules.isEmpty()) {
-                        totalErrorCountLabel.setText(
-                            String.format(
-                                "Modules awaiting response: %s", awaitingResponseModules));
-                        totalErrorCountLabel.getStyle().set("color", ComponentColor.ALARM.value);
-                      } else if (errors.isEmpty()) {
-                        totalErrorCountLabel.getStyle().set("color", ComponentColor.OK.value);
-                        totalErrorCountLabel.setText("No errors found");
-                      } else {
-                        totalErrorCountLabel.getStyle().set("color", ComponentColor.ALARM.value);
-                        totalErrorCountLabel.setText(
-                            String.format("Total errors found: %s", errors.size()));
-                      }
-                    }));
+    diagnoseService
+        .updateModulesErrors()
+        .doOnNext(
+            ignore ->
+                getUI()
+                    .ifPresent(
+                        ui ->
+                            ui.access(
+                                () -> {
+                                  diagnoseService.updateErrors(
+                                      PORTAL_MODULE, errorHandlingService.getErrorPredictions());
+                                  final ConcurrentLinkedQueue<ErrorPredictionDiagnostic> errors =
+                                      diagnoseService.getErrors();
+                                  errorsGrid.setItems(errors);
+                                  errorsGrid.setHeightFull();
+                                  errorsGrid.setAllRowsVisible(true);
+                                  totalErrorCountLabel.getStyle().set("margin", "auto");
+                                  final List<String> awaitingResponseModules =
+                                      errors.stream()
+                                          .filter(
+                                              errorPredictionDiagnostic ->
+                                                  WAITING_FOR_MODULE_RESPONSE.equals(
+                                                      errorPredictionDiagnostic.getMessage()))
+                                          .map(ErrorPredictionDiagnostic::getModuleName)
+                                          .toList();
+                                  if (!awaitingResponseModules.isEmpty()) {
+                                    totalErrorCountLabel.setText(
+                                        String.format(
+                                            "Modules awaiting response: %s",
+                                            awaitingResponseModules));
+                                    totalErrorCountLabel
+                                        .getStyle()
+                                        .set("color", ComponentColor.ALARM.value);
+                                  } else if (errors.isEmpty()) {
+                                    totalErrorCountLabel
+                                        .getStyle()
+                                        .set("color", ComponentColor.OK.value);
+                                    totalErrorCountLabel.setText("No errors found");
+                                  } else {
+                                    totalErrorCountLabel
+                                        .getStyle()
+                                        .set("color", ComponentColor.ALARM.value);
+                                    totalErrorCountLabel.setText(
+                                        String.format("Total errors found: %s", errors.size()));
+                                  }
+                                })))
+        .subscribe();
   }
 
   @Override
@@ -232,10 +250,9 @@ public class DiagnosticView extends VerticalLayout {
                   final HorizontalLayout layout = new HorizontalLayout();
                   final Button button =
                       new Button(
-                          "Port: "
-                              + moduleDetails
-                                  .getServiceAddress()
-                                  .substring(moduleDetails.getServiceAddress().indexOf(":")));
+                          moduleDetails
+                              .getServiceAddress()
+                              .substring(moduleDetails.getServiceAddress().indexOf(":") + 1));
                   button.addClickListener(
                       buttonClickEvent -> {
                         UI.getCurrent()

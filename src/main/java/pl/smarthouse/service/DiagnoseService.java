@@ -8,6 +8,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,8 @@ public class DiagnoseService {
   private final ModuleService moduleService;
   private final WebService webService;
   private final ErrorHandlingService errorHandlingService;
-  private final List<ErrorPredictionDiagnostic> errors = new ArrayList<>();
+  private final ConcurrentLinkedQueue<ErrorPredictionDiagnostic> errors =
+      new ConcurrentLinkedQueue<>();
 
   public Flux<ModuleDetails> getModulesDetails() {
     return Flux.fromIterable(moduleService.getModuleDtos())
@@ -133,7 +135,7 @@ public class DiagnoseService {
     errorHandlingService.finishConnectionIssueError(moduleName);
     errors.removeIf(errors -> moduleName.equals(errors.getModuleName()));
     errors.addAll(updateErrors);
-    return errors;
+    return updateErrors;
   }
 
   public void acknowledgeAllPending() {
@@ -190,7 +192,7 @@ public class DiagnoseService {
     return errorPredictionDiagnostic;
   }
 
-  public List<ErrorPredictionDiagnostic> getErrors() {
+  public ConcurrentLinkedQueue<ErrorPredictionDiagnostic> getErrors() {
     return errors;
   }
 
