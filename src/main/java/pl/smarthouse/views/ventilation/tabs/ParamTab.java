@@ -1,11 +1,15 @@
 package pl.smarthouse.views.ventilation.tabs;
 
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import pl.smarthouse.components.params.PercentageField;
+import pl.smarthouse.components.params.TemperatureField;
 import pl.smarthouse.components.params.TimeRangesGrid;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.IntakeThrottleMode;
 
 public class ParamTab {
 
@@ -75,6 +79,20 @@ public class ParamTab {
             ventModuleParamsDto.setOutletFanNightHoursMaxPower(
                 outletFanNightHoursMaxPowerField.getValue()));
 
+    final NumberField outsideTemperatureThreshold =
+        new TemperatureField("out temp threshold", 18, 27);
+    outsideTemperatureThreshold.setValue(ventModuleParamsDto.getOutsideIntakeThreshold());
+    outsideTemperatureThreshold.addValueChangeListener(
+        event ->
+            ventModuleParamsDto.setOutsideIntakeThreshold(outsideTemperatureThreshold.getValue()));
+
+    final ComboBox<IntakeThrottleMode> intakeThrottleModeComboBox =
+        new ComboBox<>("Intake throttle mode");
+    intakeThrottleModeComboBox.setItems(IntakeThrottleMode.values());
+    intakeThrottleModeComboBox.setValue(ventModuleParamsDto.getIntakeThrottleMode());
+    intakeThrottleModeComboBox.addValueChangeListener(
+        event -> ventModuleParamsDto.setIntakeThrottleMode(event.getValue()));
+
     final TimeRangesGrid nightHours =
         new TimeRangesGrid("Night hours", ventModuleParamsDto.getNightHours(), false);
 
@@ -86,6 +104,8 @@ public class ParamTab {
         airHeatingCheckBox,
         airCoolingCheckBox,
         airConditionCheckBox,
+        intakeThrottleModeComboBox,
+        outsideTemperatureThreshold,
         nightHoursCheckBox,
         inletFanNightHoursMaxPowerField,
         outletFanNightHoursMaxPowerField,
