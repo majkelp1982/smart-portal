@@ -41,7 +41,7 @@ public class FireplaceView extends VerticalLayout {
     fireplaceModuleDto =
         (FireplaceModuleDto)
             moduleService.getModuleDtos().stream()
-                .filter(moduleDto -> moduleDto.getModuleName().contains("FIREPLACE"))
+                .filter(moduleDto -> moduleDto.getType().contains("FIREPLACE"))
                 .findFirst()
                 .get();
     valueContainer = new ValueContainer(fireplaceModuleDto);

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class ModuleDetails {
   int reconnectCount;
-  private String moduleType;
+  private String type;
   private String macAddress;
   private String serviceAddress;
   private String version;
@@ -18,6 +18,7 @@ public class ModuleDetails {
   private String moduleIpAddress;
   private String firmware;
   private LocalDateTime moduleUpdateTimestamp;
+  private long uptimeInMinutes;
 
   public Long getServiceLastUpdateInSec() {
     return Duration.between(serviceUpdateTimestamp, LocalDateTime.now()).toSeconds();
@@ -36,11 +37,11 @@ public class ModuleDetails {
       return false;
     }
     final ModuleDetails that = (ModuleDetails) o;
-    return moduleType.equals(that.moduleType);
+    return type.equals(that.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(moduleType);
+    return Objects.hash(type);
   }
 }

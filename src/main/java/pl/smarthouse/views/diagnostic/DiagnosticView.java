@@ -1,6 +1,5 @@
 package pl.smarthouse.views.diagnostic;
 
-import static pl.smarthouse.service.DiagnoseService.WAITING;
 import static pl.smarthouse.service.DiagnoseService.WAITING_FOR_MODULE_RESPONSE;
 import static pl.smarthouse.service.ErrorHandlingService.PORTAL_MODULE;
 
@@ -20,10 +19,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.internal.StringUtil;
@@ -100,7 +96,7 @@ public class DiagnosticView extends VerticalLayout {
   }
 
   private void updateModulesDetails(final ModuleDetails moduleDetails) {
-    if (StringUtil.isBlank(moduleDetails.getModuleType())) {
+    if (StringUtil.isBlank(moduleDetails.getType())) {
       return;
     }
     modulesDetails.remove(moduleDetails);
@@ -135,7 +131,7 @@ public class DiagnosticView extends VerticalLayout {
                                               errorPredictionDiagnostic ->
                                                   WAITING_FOR_MODULE_RESPONSE.equals(
                                                       errorPredictionDiagnostic.getMessage()))
-                                          .map(ErrorPredictionDiagnostic::getModuleName)
+                                          .map(ErrorPredictionDiagnostic::getType)
                                           .toList();
                                   if (!awaitingResponseModules.isEmpty()) {
                                     totalErrorCountLabel.setText(
@@ -199,10 +195,7 @@ public class DiagnosticView extends VerticalLayout {
   }
 
   private void prepareErrorGrid() {
-    errorsGrid
-        .addColumn(ErrorPredictionDiagnostic::getModuleName)
-        .setKey("Module")
-        .setHeader("Module");
+    errorsGrid.addColumn(ErrorPredictionDiagnostic::getType).setKey("Module").setHeader("Module");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getMessage).setHeader("Message");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getPriority).setHeader("Prio");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getBeginTimeString).setHeader("Begin");
@@ -239,16 +232,27 @@ public class DiagnosticView extends VerticalLayout {
         event -> {
           modulesDetails.stream()
               .map(ModuleDetails::getModuleIpAddress)
-              .filter(moduleIpAddress -> !moduleIpAddress.equals(WAITING))
               .forEach(diagnoseService::restartModule);
         });
 
-    layout.add(restartAllModulesButton, totalModuleDeatilsCountLabel);
+    final Button uploadTestButton = new Button("uploadTestButton");
+    uploadTestButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+    uploadTestButton.addClickListener(
+        event -> {
+          // TODO
+          try {
+            firmwareUploadService.uploadFirmware();
+          } catch (final IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+        });
+
+    layout.add(totalModuleDeatilsCountLabel, restartAllModulesButton, uploadTestButton);
     return layout;
   }
 
   private void prepareModuleDetailsGrid() {
-    moduleDetailsGrid.addColumn(ModuleDetails::getModuleType).setKey("Module").setHeader("Module");
+    moduleDetailsGrid.addColumn(ModuleDetails::getType).setKey("Module").setHeader("Module");
     moduleDetailsGrid
         .addColumn(
             new ComponentRenderer<>(
@@ -258,14 +262,19 @@ public class DiagnosticView extends VerticalLayout {
                       new Button(
                           moduleDetails
                               .getServiceAddress()
-                              .substring(moduleDetails.getServiceAddress().indexOf(":") + 1));
+                              .substring(
+                                  moduleDetails.getServiceAddress().indexOf(":") + 1,
+                                  moduleDetails.getServiceAddress().indexOf("/")));
                   button.addClickListener(
                       buttonClickEvent -> {
                         UI.getCurrent()
                             .getPage()
                             .executeJs(
                                 "window.open('http://"
-                                    + moduleDetails.getServiceAddress()
+                                    + moduleDetails
+                                        .getServiceAddress()
+                                        .substring(
+                                            0, moduleDetails.getServiceAddress().indexOf("/"))
                                     + "/swagger-ui.html', '_blank');");
                       });
                   layout.add(button);
@@ -291,8 +300,12 @@ public class DiagnosticView extends VerticalLayout {
                   return layout;
                 }))
         .setHeader("Module");
+    moduleDetailsGrid.addColumn(ModuleDetails::getMacAddress).setHeader("MAC address");
+    moduleDetailsGrid.addColumn(ModuleDetails::getVersion).setHeader("Version");
+
     moduleDetailsGrid.addColumn(ModuleDetails::getFirmware).setHeader("Firmware");
-    moduleDetailsGrid.addColumn(ModuleDetails::getReconnectCount).setHeader("Reconnect");
+    moduleDetailsGrid.addColumn(ModuleDetails::getReconnectCount).setHeader("module reconnect");
+    moduleDetailsGrid.addColumn(ModuleDetails::getUptimeInMinutes).setHeader("module uptime [min]");
     moduleDetailsGrid
         .addColumn(ModuleDetails::getModuleLastUpdateInSec)
         .setHeader("Module last update [s]");

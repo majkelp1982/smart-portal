@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.model.diagnostic.ErrorPredictionDiagnostic;
 import pl.smarthouse.model.diagnostic.ModuleDetails;
-import pl.smarthouse.properties.ModuleManagerProperties;
 import pl.smarthouse.service.module.ModuleService;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
-import pl.smarthouse.sharedobjects.dto.SettingsDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,8 +23,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class DiagnoseService {
   public static final String WAITING_FOR_MODULE_RESPONSE = "WAITING FOR MODULE RESPONSE";
-  public static final String WAITING = "WAITING...";
-  private final ModuleManagerProperties moduleManagerProperties;
   private final ModuleService moduleService;
   private final WebService webService;
   private final ErrorHandlingService errorHandlingService;
@@ -35,66 +30,25 @@ public class DiagnoseService {
       new ConcurrentLinkedQueue<>();
 
   public Flux<ModuleDetails> getModulesDetails() {
-    return Flux.fromIterable(moduleService.getModuleDtos())
-        .parallel()
-        .flatMap(
-            moduleDto ->
-                getModuleSettings(moduleDto)
-                    .flatMap(
-                        settingsDto ->
-                            getModuleParams(settingsDto)
-                                .map(
-                                    moduleDetails ->
-                                        enrichWithModuleSettings(settingsDto, moduleDetails)))
-                    .onErrorResume(
-                        throwable ->
-                            Mono.justOrEmpty(
-                                createModuleDetailsWaiting(moduleDto.getModuleName()))))
-        .sequential();
-  }
-
-  private ModuleDetails createModuleDetailsWaiting(final String moduleName) {
-    final ModuleDetails moduleDetailsWaiting = new ModuleDetails();
-    moduleDetailsWaiting.setModuleType(moduleName);
-    moduleDetailsWaiting.setServiceAddress(WAITING);
-    moduleDetailsWaiting.setServiceUpdateTimestamp(LocalDateTime.now());
-    moduleDetailsWaiting.setModuleIpAddress(WAITING);
-    moduleDetailsWaiting.setModuleUpdateTimestamp(LocalDateTime.now());
-    moduleDetailsWaiting.setFirmware(WAITING);
-    moduleDetailsWaiting.setReconnectCount(0);
-    return moduleDetailsWaiting;
+    return Flux.fromIterable(moduleService.getModuleDtos()).map(this::toModuleDetails);
   }
 
   public int getModuleCount() {
     return moduleService.getModuleDtos().size();
   }
 
-  private ModuleDetails enrichWithModuleSettings(
-      final SettingsDto settingsDto, final ModuleDetails moduleDetails) {
-    moduleDetails.setServiceAddress(settingsDto.getServiceAddress());
-    moduleDetails.setModuleIpAddress(settingsDto.getModuleIpAddress());
-    moduleDetails.setModuleUpdateTimestamp(
-        LocalDateTime.ofInstant(settingsDto.getModuleUpdateTimestamp(), ZoneId.systemDefault()));
-    moduleDetails.setServiceUpdateTimestamp(
-        LocalDateTime.ofInstant(settingsDto.getServiceUpdateTimestamp(), ZoneId.systemDefault()));
+  private ModuleDetails toModuleDetails(final ModuleDto moduleDto) {
+    final ModuleDetails moduleDetails = new ModuleDetails();
+    moduleDetails.setType(moduleDto.getType());
+    moduleDetails.setMacAddress(moduleDto.getModuleMacAddress());
+    moduleDetails.setServiceAddress(moduleDto.getServiceAddress());
+    moduleDetails.setVersion(moduleDto.getServiceVersion());
+    moduleDetails.setServiceUpdateTimestamp(moduleDto.getServiceUpdateTimestamp());
+    moduleDetails.setModuleIpAddress(moduleDto.getModuleIpAddress());
+    moduleDetails.setFirmware(moduleDto.getModuleFirmwareVersion());
+    moduleDetails.setModuleUpdateTimestamp(moduleDto.getModuleUpdateTimestamp());
+    moduleDetails.setUptimeInMinutes(moduleDto.getUptimeInMinutes());
     return moduleDetails;
-  }
-
-  private Mono<ModuleDetails> getModuleParams(final SettingsDto settingsDto) {
-    return webService
-        .get(String.format("%s/params", settingsDto.getModuleIpAddress()), ModuleDetails.class)
-        .collectList()
-        .map(signal -> signal.get(0));
-  }
-
-  private Mono<SettingsDto> getModuleSettings(final ModuleDto moduleDto) {
-    return webService
-        .get(
-            String.format(
-                "%s/settings?type=%s", moduleManagerProperties.getURL(), moduleDto.getModuleName()),
-            SettingsDto.class)
-        .collectList()
-        .map(settingsDtos -> settingsDtos.get(0));
   }
 
   public void restartModule(final String moduleIpAddress) {
@@ -127,30 +81,30 @@ public class DiagnoseService {
                         throwable -> {
                           log.error(
                               "Error occurred when getting error list from {}, error: {}",
-                              moduleDto.getModuleName(),
+                              moduleDto.getType(),
                               throwable.getMessage());
                           errorHandlingService.createConnectionIssueError(
-                              moduleDto.getModuleName(), throwable);
+                              moduleDto.getType(), throwable);
                           return Mono.empty();
                         })
-                    .map(errors -> toErrorList(moduleDto.getModuleName(), errors))
+                    .map(errors -> toErrorList(moduleDto.getType(), errors))
                     .doOnNext(
                         list ->
                             log.info(
                                 "Updating errors. Module: {}, list size: {}, total: {}",
-                                moduleDto.getModuleName(),
+                                moduleDto.getType(),
                                 list.size(),
                                 errors.size()))
                     .map(
                         errorPredictionsDiagnostic ->
-                            updateErrors(moduleDto.getModuleName(), errorPredictionsDiagnostic)))
+                            updateErrors(moduleDto.getType(), errorPredictionsDiagnostic)))
         .sequential();
   }
 
   public synchronized List<ErrorPredictionDiagnostic> updateErrors(
       final String moduleName, final List<ErrorPredictionDiagnostic> updateErrors) {
     errorHandlingService.finishConnectionIssueError(moduleName);
-    errors.removeIf(errors -> moduleName.equals(errors.getModuleName()));
+    errors.removeIf(errors -> moduleName.equals(errors.getType()));
     errors.addAll(updateErrors);
     return updateErrors;
   }
@@ -160,8 +114,7 @@ public class DiagnoseService {
         .doOnNext(
             moduleDto ->
                 log.info(
-                    "Sending acknowledge all pending errors to module: {}",
-                    moduleDto.getModuleName()))
+                    "Sending acknowledge all pending errors to module: {}", moduleDto.getType()))
         .flatMap(
             moduleDto ->
                 webService.patch(
@@ -204,7 +157,7 @@ public class DiagnoseService {
     objectMapper.registerModule(new JavaTimeModule());
     final ErrorPredictionDiagnostic errorPredictionDiagnostic =
         objectMapper.convertValue(errorPredictionObject, ErrorPredictionDiagnostic.class);
-    errorPredictionDiagnostic.setModuleName(moduleName);
+    errorPredictionDiagnostic.setType(moduleName);
     errorPredictionDiagnostic.setHashCode(hashcode);
     return errorPredictionDiagnostic;
   }
@@ -215,16 +168,16 @@ public class DiagnoseService {
 
   public void initModuleErrors() {
     moduleService.getModuleDtos().stream()
-        .map(moduleDto -> createInitModuleError(moduleDto.getModuleName()))
+        .map(moduleDto -> createInitModuleError(moduleDto.getType()))
         .forEach(
             errorPredictionDiagnostic ->
                 updateErrors(
-                    errorPredictionDiagnostic.getModuleName(), List.of(errorPredictionDiagnostic)));
+                    errorPredictionDiagnostic.getType(), List.of(errorPredictionDiagnostic)));
   }
 
   private ErrorPredictionDiagnostic createInitModuleError(final String moduleName) {
     final ErrorPredictionDiagnostic errorPredictionDiagnostic = new ErrorPredictionDiagnostic();
-    errorPredictionDiagnostic.setModuleName(moduleName);
+    errorPredictionDiagnostic.setType(moduleName);
     errorPredictionDiagnostic.setMessage(WAITING_FOR_MODULE_RESPONSE);
     errorPredictionDiagnostic.setBeginTimestamp(LocalDateTime.now());
     return errorPredictionDiagnostic;

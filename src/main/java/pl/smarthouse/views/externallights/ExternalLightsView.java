@@ -41,7 +41,7 @@ public class ExternalLightsView extends VerticalLayout {
     externalLightsModuleDto =
         (ExternalLightsModuleDto)
             moduleService.getModuleDtos().stream()
-                .filter(moduleDto -> moduleDto.getModuleName().contains("EXTERNAL_LIGHTS"))
+                .filter(moduleDto -> moduleDto.getType().contains("EXTERNAL_LIGHTS"))
                 .findFirst()
                 .get();
     valueContainer = new ValueContainer(externalLightsModuleDto);

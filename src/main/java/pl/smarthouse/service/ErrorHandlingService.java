@@ -33,7 +33,7 @@ public class ErrorHandlingService {
     }
 
     final ErrorPredictionDiagnostic moduleConnectionError = new ErrorPredictionDiagnostic();
-    moduleConnectionError.setModuleName(PORTAL_MODULE);
+    moduleConnectionError.setType(PORTAL_MODULE);
     moduleConnectionError.setMessage(
         String.format("Module: %s, connection error: %s", moduleName, throwable.getMessage()));
     moduleConnectionError.setBeginTimestamp(LocalDateTime.now());

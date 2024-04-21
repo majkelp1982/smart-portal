@@ -22,3 +22,6 @@ vaadin-scroller[slot="drawer"] {
   box-shadow: 2px 2px 3px 1px rgb(60, 63, 65);
   }
 
+.warn {
+  background-color: yellow;
+}

@@ -75,8 +75,8 @@ public class ComfortView extends VerticalLayout {
     add(tabs);
 
     moduleService.getModuleDtos().stream()
-        .filter(moduleDto -> moduleDto.getModuleName().contains("COMFORT"))
-        .sorted(Comparator.comparing(ModuleDto::getModuleName))
+        .filter(moduleDto -> moduleDto.getType().contains("COMFORT"))
+        .sorted(Comparator.comparing(ModuleDto::getType))
         .map(moduleDto -> (ComfortModuleDto) moduleDto)
         .forEach(this::createZoneTab);
 
@@ -86,8 +86,7 @@ public class ComfortView extends VerticalLayout {
 
   private void createZoneTab(final ComfortModuleDto moduleDto) {
 
-    final ZoneName zoneName =
-        ZoneName.valueOf(cutNameIfNecessaryAndReturn(moduleDto.getModuleName()));
+    final ZoneName zoneName = ZoneName.valueOf(cutNameIfNecessaryAndReturn(moduleDto.getType()));
 
     // Add zone to overview
     if (horizontalOverviewTiles.size() == 0) {

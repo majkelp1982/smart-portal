@@ -30,7 +30,7 @@ public class WeatherView extends VerticalLayout {
     weatherModuleDto =
         (WeatherModuleDto)
             moduleService.getModuleDtos().stream()
-                .filter(moduleDto -> moduleDto.getModuleName().contains("WEATHER"))
+                .filter(moduleDto -> moduleDto.getType().contains("WEATHER"))
                 .findFirst()
                 .get();
     valueContainer = new ValueContainer(weatherModuleDto);

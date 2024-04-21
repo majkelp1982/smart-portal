@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 public class ErrorPredictionDiagnostic {
   private String hashCode;
-  private String moduleName;
+  private String type;
   private String message;
   private int priority;
   private LocalDateTime beginTimestamp;

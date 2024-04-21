@@ -1,11 +1,13 @@
 package pl.smarthouse.service.module;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -20,18 +22,14 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 @EnableScheduling
 @Slf4j
-public class ModuleService implements ApplicationListener<ApplicationStartedEvent> {
+public class ModuleService {
   private final WebService webService;
   private final ModuleManagerProperties moduleManagerProperties;
   private final List<ModuleDto> moduleList;
-  private final List<ModuleCreator> moduleCreators;
+  private final Set<ModuleCreator> moduleCreators;
 
-  @Override
-  public void onApplicationEvent(final ApplicationStartedEvent event) {
-    initializeModels();
-  }
-
-  private void initializeModels() {
+  @Scheduled(initialDelay = 1000, fixedDelay = 1000 * 30)
+  private void updateModels() {
     webService
         .get(moduleManagerProperties.getURL() + "/all", SettingsDto.class)
         .filter(
@@ -44,17 +42,36 @@ public class ModuleService implements ApplicationListener<ApplicationStartedEven
             SettingsDto.class,
             discardedElement ->
                 log.error("For type: {}, no module creator is defined", discardedElement.getType()))
-        .doOnNext(this::createModel)
+        .doOnNext(this::updateModuleList)
         .subscribe();
   }
 
-  private void createModel(final SettingsDto settingsDto) {
+  private void updateModuleList(final SettingsDto settingsDto) {
     final ModuleCreator moduleCreator = getModuleCreator(settingsDto.getType());
-    final ModuleDto moduleDto = moduleCreator.createBaseModel();
+    final Optional<ModuleDto> moduleDtoOptional =
+        moduleList.stream()
+            .filter(module -> module.getType().equals(settingsDto.getType()))
+            .findFirst();
+    ModuleDto moduleDto = null;
+    if (moduleDtoOptional.isPresent()) {
+      moduleDto = moduleDtoOptional.get();
+    } else {
+      moduleDto = moduleCreator.createBaseModel();
+      moduleDto.setType(settingsDto.getType());
+      moduleList.add(moduleDto);
+    }
     moduleDto.setServiceAddress(
         moduleCreator.enrichServiceAddress(settingsDto.getServiceAddress()));
-    moduleDto.setModuleName(settingsDto.getType());
-    moduleList.add(moduleDto);
+    moduleDto.setModuleMacAddress(settingsDto.getModuleMacAddress());
+    moduleDto.setServiceVersion(settingsDto.getServiceVersion());
+    moduleDto.setModuleFirmwareVersion(settingsDto.getModuleFirmwareVersion());
+    moduleDto.setModuleIpAddress(settingsDto.getModuleIpAddress());
+    moduleDto.setModuleUpdateTimestamp(
+        LocalDateTime.ofInstant(settingsDto.getModuleUpdateTimestamp(), ZoneId.systemDefault()));
+    moduleDto.setServiceUpdateTimestamp(
+        LocalDateTime.ofInstant(settingsDto.getServiceUpdateTimestamp(), ZoneId.systemDefault()));
+    moduleDto.setConnectionEstablish(settingsDto.isConnectionEstablish());
+    moduleDto.setUptimeInMinutes(settingsDto.getUptimeInMinutes());
   }
 
   private ModuleCreator getModuleCreator(final String type) {
@@ -76,7 +93,7 @@ public class ModuleService implements ApplicationListener<ApplicationStartedEven
                     .get(moduleDto.getServiceAddress(), moduleDto.getClass())
                     .doOnNext(
                         updateData ->
-                            getModuleCreator(moduleDto.getModuleName())
+                            getModuleCreator(moduleDto.getType())
                                 .updateData(moduleDto, updateData)))
         .subscribe();
   }

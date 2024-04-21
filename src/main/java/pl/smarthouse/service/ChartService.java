@@ -196,7 +196,7 @@ public class ChartService {
   public Flux<Map<String, List<String>>> getFieldsMapFromModules() {
     return Flux.fromIterable(moduleService.getModuleDtos())
         .parallel()
-        .map(moduleDto -> moduleDto.getModuleName().toLowerCase())
+        .map(moduleDto -> moduleDto.getType().toLowerCase())
         .doOnNext(moduleName -> log.info("Query module name: {}", moduleName))
         .flatMap(
             moduleName ->

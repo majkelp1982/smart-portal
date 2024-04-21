@@ -19,7 +19,7 @@ public abstract class ModuleCreator {
     // Update basic values
     moduleDto.setError(updateObject.isError());
     moduleDto.setErrorPendingAcknowledge(updateObject.isErrorPendingAcknowledge());
-    moduleDto.setUpdateTimestamp(LocalDateTime.now());
+    moduleDto.setValuesUpdateTimestamp(LocalDateTime.now());
     updateDataSpec(moduleDto, updateObject);
   }
 

@@ -37,7 +37,7 @@ public class VentilationView extends VerticalLayout {
     ventModuleDto =
         (VentModuleDto)
             moduleService.getModuleDtos().stream()
-                .filter(moduleDto -> moduleDto.getModuleName().contains("VENTILATION"))
+                .filter(moduleDto -> moduleDto.getType().contains("VENTILATION"))
                 .findFirst()
                 .get();
     valueContainer = new ValueContainer(ventModuleDto);
