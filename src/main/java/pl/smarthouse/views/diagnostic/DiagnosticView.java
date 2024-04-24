@@ -8,6 +8,7 @@ import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.html.Label;
@@ -40,6 +41,10 @@ import pl.smarthouse.views.MainView;
 @EnableScheduling
 @PreserveOnRefresh
 public class DiagnosticView extends VerticalLayout {
+  static final String TOTAL_TIME = "totalTime";
+  static final String ERROR_COUNT = "errorCount";
+  static final String DURATION = "duration";
+  final Checkbox groupErrors = new Checkbox("group errors");
   private final DiagnoseService diagnoseService;
   private final ErrorHandlingService errorHandlingService;
   private final Grid<ErrorPredictionDiagnostic> errorsGrid = new Grid<>();
@@ -56,6 +61,7 @@ public class DiagnosticView extends VerticalLayout {
     this.diagnoseService = diagnoseService;
     this.errorHandlingService = errorHandlingService;
     this.firmwareUploadService = firmwareUploadService;
+    groupErrors.setValue(true);
     createView();
   }
 
@@ -103,58 +109,51 @@ public class DiagnosticView extends VerticalLayout {
     modulesDetails.add(moduleDetails);
   }
 
+  @Scheduled(fixedDelay = 30000)
+  private void refreshModuleErrors() {
+    diagnoseService.updateModulesErrors().subscribe();
+  }
+
   @Scheduled(fixedDelay = 10000)
   private void refreshErrorDetails() {
     if (!isAttached()) {
       return;
     }
-    diagnoseService
-        .updateModulesErrors()
-        .doOnNext(
-            ignore ->
-                getUI()
-                    .ifPresent(
-                        ui ->
-                            ui.access(
-                                () -> {
-                                  diagnoseService.updateErrors(
-                                      PORTAL_MODULE, errorHandlingService.getErrorPredictions());
-                                  final ConcurrentLinkedQueue<ErrorPredictionDiagnostic> errors =
-                                      diagnoseService.getErrors();
-                                  errorsGrid.setItems(errors);
-                                  errorsGrid.setHeightFull();
-                                  errorsGrid.setAllRowsVisible(true);
-                                  totalErrorCountLabel.getStyle().set("margin", "auto");
-                                  final List<String> awaitingResponseModules =
-                                      errors.stream()
-                                          .filter(
-                                              errorPredictionDiagnostic ->
-                                                  WAITING_FOR_MODULE_RESPONSE.equals(
-                                                      errorPredictionDiagnostic.getMessage()))
-                                          .map(ErrorPredictionDiagnostic::getType)
-                                          .toList();
-                                  if (!awaitingResponseModules.isEmpty()) {
-                                    totalErrorCountLabel.setText(
-                                        String.format(
-                                            "Modules awaiting response: %s",
-                                            awaitingResponseModules));
-                                    totalErrorCountLabel
-                                        .getStyle()
-                                        .set("color", ComponentColor.ALARM.value);
-                                  } else if (errors.isEmpty()) {
-                                    totalErrorCountLabel
-                                        .getStyle()
-                                        .set("color", ComponentColor.OK.value);
-                                    totalErrorCountLabel.setText("No errors found");
-                                  } else {
-                                    totalErrorCountLabel
-                                        .getStyle()
-                                        .set("color", ComponentColor.ALARM.value);
-                                    totalErrorCountLabel.setText(
-                                        String.format("Total errors found: %s", errors.size()));
-                                  }
-                                })))
-        .subscribe();
+    getUI()
+        .ifPresent(
+            ui ->
+                ui.access(
+                    () -> {
+                      diagnoseService.updateErrors(
+                          PORTAL_MODULE, errorHandlingService.getErrorPredictions());
+                      final ConcurrentLinkedQueue<ErrorPredictionDiagnostic> errors =
+                          diagnoseService.getErrors(groupErrors.getValue());
+                      errorsGrid.setItems(errors);
+                      errorsGrid.setHeightFull();
+                      errorsGrid.setAllRowsVisible(true);
+                      totalErrorCountLabel.getStyle().set("margin", "auto");
+                      final List<String> awaitingResponseModules =
+                          errors.stream()
+                              .filter(
+                                  errorPredictionDiagnostic ->
+                                      WAITING_FOR_MODULE_RESPONSE.equals(
+                                          errorPredictionDiagnostic.getMessage()))
+                              .map(ErrorPredictionDiagnostic::getType)
+                              .toList();
+                      if (!awaitingResponseModules.isEmpty()) {
+                        totalErrorCountLabel.setText(
+                            String.format(
+                                "Modules awaiting response: %s", awaitingResponseModules));
+                        totalErrorCountLabel.getStyle().set("color", ComponentColor.ALARM.value);
+                      } else if (errors.isEmpty()) {
+                        totalErrorCountLabel.getStyle().set("color", ComponentColor.OK.value);
+                        totalErrorCountLabel.setText("No errors found");
+                      } else {
+                        totalErrorCountLabel.getStyle().set("color", ComponentColor.ALARM.value);
+                        totalErrorCountLabel.setText(
+                            String.format("Total errors found: %s", errors.size()));
+                      }
+                    }));
   }
 
   @Override
@@ -173,7 +172,7 @@ public class DiagnosticView extends VerticalLayout {
   }
 
   private void createView() {
-    add(createErrorLayout(), createModuleDetailLayout());
+    add(createModuleDetailLayout(), createErrorLayout());
   }
 
   private VerticalLayout createErrorLayout() {
@@ -190,17 +189,23 @@ public class DiagnosticView extends VerticalLayout {
         e -> {
           diagnoseService.acknowledgeAllPending();
         });
-    layout.add(acknowledgeAllPendingButton, totalErrorCountLabel);
+
+    groupErrors.addValueChangeListener(
+        event -> {
+          addColumnsBaseOnGroupCheckbox();
+          refreshErrorDetails();
+        });
+    layout.add(acknowledgeAllPendingButton, groupErrors, totalErrorCountLabel);
     return layout;
   }
 
   private void prepareErrorGrid() {
+    errorsGrid.removeAllColumns();
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getType).setKey("Module").setHeader("Module");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getMessage).setHeader("Message");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getPriority).setHeader("Prio");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getBeginTimeString).setHeader("Begin");
     errorsGrid.addColumn(ErrorPredictionDiagnostic::getEndTimeString).setHeader("End");
-    errorsGrid.addColumn(ErrorPredictionDiagnostic::getDuration).setHeader("Duration[s]");
     errorsGrid
         .getColumns()
         .forEach(
@@ -216,6 +221,37 @@ public class DiagnosticView extends VerticalLayout {
     errorsGrid.sort(
         Collections.singletonList(
             new GridSortOrder<>(errorsGrid.getColumnByKey("Module"), SortDirection.ASCENDING)));
+    addColumnsBaseOnGroupCheckbox();
+  }
+
+  private void addColumnsBaseOnGroupCheckbox() {
+    if (groupErrors.getValue()) {
+      if (errorsGrid.getColumnByKey(DURATION) != null) {
+        errorsGrid.removeColumnByKey(DURATION);
+      }
+      errorsGrid
+          .addColumn(ErrorPredictionDiagnostic::getErrorCount)
+          .setHeader("error count")
+          .setSortable(true)
+          .setKey(ERROR_COUNT);
+      errorsGrid
+          .addColumn(ErrorPredictionDiagnostic::getTotalTimeInMinutes)
+          .setHeader("Total time[min]")
+          .setSortable(true)
+          .setKey(TOTAL_TIME);
+    } else {
+      if (errorsGrid.getColumnByKey(ERROR_COUNT) != null) {
+        errorsGrid.removeColumnByKey(ERROR_COUNT);
+      }
+      if (errorsGrid.getColumnByKey(TOTAL_TIME) != null) {
+        errorsGrid.removeColumnByKey(TOTAL_TIME);
+      }
+      errorsGrid
+          .addColumn(ErrorPredictionDiagnostic::getDuration)
+          .setHeader("Duration[s]")
+          .setSortable(true)
+          .setKey(DURATION);
+    }
   }
 
   private VerticalLayout createModuleDetailLayout() {

@@ -15,6 +15,9 @@ public class ErrorPredictionDiagnostic {
   private LocalDateTime beginTimestamp;
   private LocalDateTime endTimestamp;
   private long duration;
+  // if grouped
+  private int errorCount;
+  private long totalTimeInMinutes;
 
   public String getBeginTimeString() {
     final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM HH:mm");
@@ -23,6 +26,10 @@ public class ErrorPredictionDiagnostic {
     } else {
       return null;
     }
+  }
+
+  public ErrorPredictionDiagnostic get() {
+    return this;
   }
 
   public String getEndTimeString() {

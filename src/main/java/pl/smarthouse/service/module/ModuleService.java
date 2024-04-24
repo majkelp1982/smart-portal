@@ -52,14 +52,14 @@ public class ModuleService {
         moduleList.stream()
             .filter(module -> module.getType().equals(settingsDto.getType()))
             .findFirst();
-    ModuleDto moduleDto = null;
-    if (moduleDtoOptional.isPresent()) {
-      moduleDto = moduleDtoOptional.get();
-    } else {
-      moduleDto = moduleCreator.createBaseModel();
-      moduleDto.setType(settingsDto.getType());
-      moduleList.add(moduleDto);
-    }
+    final ModuleDto moduleDto =
+        moduleDtoOptional.orElseGet(
+            () -> {
+              final ModuleDto module = moduleCreator.createBaseModel();
+              module.setType(settingsDto.getType());
+              moduleList.add(module);
+              return module;
+            });
     moduleDto.setServiceAddress(
         moduleCreator.enrichServiceAddress(settingsDto.getServiceAddress()));
     moduleDto.setModuleMacAddress(settingsDto.getModuleMacAddress());

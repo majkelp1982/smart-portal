@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -162,8 +163,58 @@ public class DiagnoseService {
     return errorPredictionDiagnostic;
   }
 
-  public ConcurrentLinkedQueue<ErrorPredictionDiagnostic> getErrors() {
+  public ConcurrentLinkedQueue<ErrorPredictionDiagnostic> getErrors(final boolean isGroupEnabled) {
+    if (isGroupEnabled) {
+      final Map<String, List<ErrorPredictionDiagnostic>> errorsByType =
+          errors.stream().collect(Collectors.groupingBy(ErrorPredictionDiagnostic::getType));
+      final ConcurrentLinkedQueue<ErrorPredictionDiagnostic> resultList =
+          new ConcurrentLinkedQueue<>();
+      errorsByType.forEach(
+          (type, moduleErrors) -> resultList.addAll(groupErrorsByMessage(moduleErrors)));
+      return resultList;
+    }
     return errors;
+  }
+
+  private ConcurrentLinkedQueue<ErrorPredictionDiagnostic> groupErrorsByMessage(
+      final List<ErrorPredictionDiagnostic> moduleErrors) {
+    final Map<String, List<ErrorPredictionDiagnostic>> errorsByMessage =
+        moduleErrors.stream().collect(Collectors.groupingBy(ErrorPredictionDiagnostic::getMessage));
+
+    final ConcurrentLinkedQueue<ErrorPredictionDiagnostic> resultList =
+        new ConcurrentLinkedQueue<>();
+    errorsByMessage.forEach((message, errors) -> resultList.add(aggregateErrorMessages(errors)));
+    return resultList;
+  }
+
+  private ErrorPredictionDiagnostic aggregateErrorMessages(
+      final List<ErrorPredictionDiagnostic> errorMessage) {
+    final List<ErrorPredictionDiagnostic> sortedList =
+        errorMessage.stream()
+            .sorted(Comparator.comparing(ErrorPredictionDiagnostic::getBeginTimestamp))
+            .toList();
+    final ErrorPredictionDiagnostic firstErrorPredictionDiagnostic = sortedList.get(0);
+    final AtomicLong totalTime = new AtomicLong();
+    final AtomicInteger errorCount = new AtomicInteger();
+    sortedList.forEach(
+        errorPredictionDiagnostic -> {
+          errorCount.getAndIncrement();
+          totalTime.addAndGet(errorPredictionDiagnostic.getDuration());
+        });
+
+    final ErrorPredictionDiagnostic resultAggregatedError = new ErrorPredictionDiagnostic();
+    resultAggregatedError.setType(firstErrorPredictionDiagnostic.getType());
+    resultAggregatedError.setMessage(firstErrorPredictionDiagnostic.getMessage());
+    resultAggregatedError.setPriority(firstErrorPredictionDiagnostic.getPriority());
+    resultAggregatedError.setBeginTimestamp(firstErrorPredictionDiagnostic.getBeginTimestamp());
+    LocalDateTime lastEndTimestamp = sortedList.get(sortedList.size() - 1).getEndTimestamp();
+    if (lastEndTimestamp == null) {
+      lastEndTimestamp = LocalDateTime.now();
+    }
+    resultAggregatedError.setEndTimestamp(lastEndTimestamp);
+    resultAggregatedError.setErrorCount(errorCount.get());
+    resultAggregatedError.setTotalTimeInMinutes(totalTime.get() / 60);
+    return resultAggregatedError;
   }
 
   public void initModuleErrors() {
