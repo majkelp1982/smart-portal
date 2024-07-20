@@ -2,7 +2,7 @@ package pl.smarthouse.views.comfort.subview;
 
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -15,6 +15,7 @@ import pl.smarthouse.components.params.TimeRangesGrid;
 import pl.smarthouse.sharedobjects.dto.comfort.core.ForcedAirControl;
 import pl.smarthouse.sharedobjects.dto.comfort.core.HeatingControl;
 import pl.smarthouse.sharedobjects.dto.comfort.core.TemperatureControl;
+import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRangeMode;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
 
 @UtilityClass
@@ -32,11 +33,11 @@ public class TemperatureControlView {
     requiredTemperatureField.addValueChangeListener(
         event -> temperatureControl.setRequiredTemperature(requiredTemperatureField.getValue()));
 
-    final DatePicker disableTimeRangesUntilDatePicker = new DatePicker();
-    disableTimeRangesUntilDatePicker.setLabel("disable time ranges until");
-    disableTimeRangesUntilDatePicker.setValue(temperatureControl.getDisableTimeRangesUntilDate());
-    disableTimeRangesUntilDatePicker.addValueChangeListener(
-        event -> temperatureControl.setDisableTimeRangesUntilDate(event.getValue()));
+    final ComboBox<TimeRangeMode> timeRangeModeComboBox = new ComboBox<>("time range mode");
+    timeRangeModeComboBox.setItems(TimeRangeMode.values());
+    timeRangeModeComboBox.setValue(temperatureControl.getTimeRangeMode());
+    timeRangeModeComboBox.addValueChangeListener(
+        event -> temperatureControl.setTimeRangeMode(event.getValue()));
 
     final Accordion temperatureControlAccordion = new Accordion();
     temperatureControlAccordion.add(
@@ -48,8 +49,7 @@ public class TemperatureControlView {
 
     temperatureControlAccordion.close();
 
-    layout.add(
-        requiredTemperatureField, disableTimeRangesUntilDatePicker, temperatureControlAccordion);
+    layout.add(requiredTemperatureField, timeRangeModeComboBox, temperatureControlAccordion);
     accordion.add("Temperature control", layout);
   }
 

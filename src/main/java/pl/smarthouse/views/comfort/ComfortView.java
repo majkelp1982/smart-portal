@@ -85,11 +85,12 @@ public class ComfortView extends VerticalLayout {
   }
 
   private void createZoneTab(final ComfortModuleDto moduleDto) {
+    log.info("Creating zone: {}", moduleDto.getType());
 
     final ZoneName zoneName = ZoneName.valueOf(cutNameIfNecessaryAndReturn(moduleDto.getType()));
 
     // Add zone to overview
-    if (horizontalOverviewTiles.size() == 0) {
+    if (horizontalOverviewTiles.isEmpty()) {
       horizontalOverviewTiles.add(new HorizontalLayout());
     }
     HorizontalLayout layout = horizontalOverviewTiles.get(horizontalOverviewTiles.size() - 1);
@@ -121,15 +122,15 @@ public class ComfortView extends VerticalLayout {
     ColorPredicates.assignToCurrentOperation(currentOperation);
     final Info requiredPower = new Info("power", "%");
     ColorPredicates.assignToRequiredPower(requiredPower);
-    final Info enableTemperatureTimeRangesInfo = new Info("Temp time ranges");
-    ColorPredicates.assignEnableState(enableTemperatureTimeRangesInfo);
+    final Info timeRangeMode = new Info("time range mode");
+    ColorPredicates.assignToTimeRangeMode(timeRangeMode);
     tile.getDetailsContainer()
         .add(
             temperature.getLayout(),
             humidity.getLayout(),
             currentOperation.getLayout(),
             requiredPower.getLayout(),
-            enableTemperatureTimeRangesInfo.getLayout());
+            timeRangeMode.getLayout());
 
     // Values
     final ValueContainer valueContainer = new ValueContainer(comfortDto);
@@ -138,7 +139,7 @@ public class ComfortView extends VerticalLayout {
     valueContainer.put("sensorResponse.humidity", humidity);
     valueContainer.put("currentOperation", currentOperation);
     valueContainer.put("requiredPower", requiredPower);
-    valueContainer.put("enableTemperatureTimeRanges", enableTemperatureTimeRangesInfo);
+    valueContainer.put("timeRangeMode", timeRangeMode);
 
     valueContainerMap.put(valueContainerName, valueContainer);
 

@@ -1,9 +1,11 @@
 package pl.smarthouse.service.module;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.comfort.ComfortModuleDto;
+import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRangeMode;
 import pl.smarthouse.sharedobjects.dto.core.Bme280ResponseDto;
 
 @Component
@@ -44,6 +46,9 @@ public class ComfortModuleCreator extends ModuleCreator {
     comfortDto.setCurrentOperation(updateObject.getCurrentOperation());
     comfortDto.setRequiredPower(updateObject.getRequiredPower());
     comfortDto.setLeftHoldTimeInMinutes(updateObject.getLeftHoldTimeInMinutes());
-    comfortDto.setEnableTemperatureTimeRanges(updateObject.getEnableTemperatureTimeRanges());
+    comfortDto.setTimeRangeMode(
+        Objects.isNull(updateObject.getTimeRangeMode())
+            ? TimeRangeMode.AUTO
+            : updateObject.getTimeRangeMode());
   }
 }

@@ -9,6 +9,7 @@ import pl.smarthouse.components.Info;
 import pl.smarthouse.components.Label;
 import pl.smarthouse.components.PortalComponent;
 import pl.smarthouse.model.ComponentColor;
+import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRangeMode;
 import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.ThrottleState;
@@ -81,6 +82,13 @@ public class ColorPredicates {
     info.addColorPredicates(component -> onModes.contains(component.getValue()), ComponentColor.ON);
     info.addColorPredicates(
         component -> Mode.COOLING.equals(component.getValue()), ComponentColor.WARNING);
+  }
+
+  public void assignToTimeRangeMode(final Info info) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OK);
+    info.addColorPredicates(
+        component -> !TimeRangeMode.AUTO.equals(component.getValue()), ComponentColor.WARNING);
   }
 
   public void assignToThrottleState(final Info info) {
