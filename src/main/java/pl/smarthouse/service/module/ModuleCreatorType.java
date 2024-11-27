@@ -5,5 +5,6 @@ public enum ModuleCreatorType {
   COMFORT,
   WEATHER,
   EXTERNAL_LIGHTS,
-  FIREPLACE
+  FIREPLACE,
+  LIGHTS_MQTT
 }

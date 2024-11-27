@@ -39,8 +39,10 @@ public class WeatherView extends VerticalLayout {
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
-              log.info("Pool listener triggered for class: {}", this.getClass().toString());
-              valueContainer.updateValues();
+              if (isAttached()) {
+                log.info("Pool listener triggered for class: {}", this.getClass().toString());
+                valueContainer.updateValues();
+              }
             });
   }
 
@@ -99,7 +101,7 @@ public class WeatherView extends VerticalLayout {
   protected void onAttach(final AttachEvent attachEvent) {
     super.onAttach(attachEvent);
 
-    UI.getCurrent().setPollInterval(1000);
+    UI.getCurrent().setPollInterval(5000);
   }
 
   @Override

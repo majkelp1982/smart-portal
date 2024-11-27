@@ -53,7 +53,7 @@ public class ChartsView extends VerticalLayout {
   @Override
   protected void onAttach(final AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    UI.getCurrent().setPollInterval(1000);
+    UI.getCurrent().setPollInterval(5000);
   }
 
   @Override

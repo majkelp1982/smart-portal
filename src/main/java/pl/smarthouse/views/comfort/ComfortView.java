@@ -51,8 +51,10 @@ public class ComfortView extends VerticalLayout {
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
-              log.info("Pool listener triggered for class: {}", this.getClass().toString());
-              valueContainerMap.values().stream().forEach(ValueContainer::updateValues);
+              if (isAttached()) {
+                log.info("Pool listener triggered for class: {}", this.getClass().toString());
+                valueContainerMap.values().stream().forEach(ValueContainer::updateValues);
+              }
             });
   }
 
@@ -60,7 +62,7 @@ public class ComfortView extends VerticalLayout {
   protected void onAttach(final AttachEvent attachEvent) {
     super.onAttach(attachEvent);
 
-    UI.getCurrent().setPollInterval(1000);
+    UI.getCurrent().setPollInterval(5000);
   }
 
   @Override

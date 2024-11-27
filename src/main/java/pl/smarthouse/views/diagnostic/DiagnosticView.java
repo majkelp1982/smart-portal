@@ -109,8 +109,11 @@ public class DiagnosticView extends VerticalLayout {
     modulesDetails.add(moduleDetails);
   }
 
-  @Scheduled(fixedDelay = 30000)
+  @Scheduled(fixedDelay = 20000)
   private void refreshModuleErrors() {
+    if (!isAttached()) {
+      return;
+    }
     diagnoseService.updateModulesErrors().subscribe();
   }
 
