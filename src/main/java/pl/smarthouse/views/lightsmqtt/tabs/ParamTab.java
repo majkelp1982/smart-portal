@@ -104,7 +104,16 @@ public class ParamTab {
     colorTemperatureField.addValueChangeListener(
         event -> lightZoneParamsDto.setColorTemperature(colorTemperatureField.getValue()));
 
-    layout.add(standbyField, colorTemperatureField);
+    final IntegerField holdTimeField = new IntegerField();
+    holdTimeField.setLabel("hold time[min] 1-10");
+    holdTimeField.setMin(1);
+    holdTimeField.setMax(10);
+    holdTimeField.setStep(1);
+    holdTimeField.setStepButtonsVisible(true);
+    holdTimeField.setValue(lightZoneParamsDto.getHoldTime());
+    holdTimeField.addValueChangeListener(
+        event -> lightZoneParamsDto.setHoldTime(holdTimeField.getValue()));
+    layout.add(standbyField, colorTemperatureField, holdTimeField);
     return layout;
   }
 

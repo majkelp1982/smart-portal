@@ -103,6 +103,10 @@ public class OverviewTab {
         .setKey("Color temp")
         .setHeader("Color temp");
     requireZoneStatesGrid
+        .addColumn(requireZoneStatesEntry -> requireZoneStatesEntry.getValue().getHoldTimeleft())
+        .setKey("Hold time left")
+        .setHeader("Hold time left[min]");
+    requireZoneStatesGrid
         .getColumns()
         .forEach(
             column -> {
