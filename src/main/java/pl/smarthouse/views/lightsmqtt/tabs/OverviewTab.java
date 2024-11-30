@@ -3,6 +3,7 @@ package pl.smarthouse.views.lightsmqtt.tabs;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridSortOrder;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.SortDirection;
@@ -21,24 +22,40 @@ public class OverviewTab {
   private final WebService webService;
   private final LightsMqttDto lightsMqttDto;
   private final Grid<Map.Entry<LightZone, ZoneState>> requireZoneStatesGrid = new Grid<>();
-  private final Grid<Light> lightGrid = new Grid<>();
+  private final Grid<Light> lightsGrid = new Grid<>();
+  private final Grid<MotionSensor> motionSensorsGrid = new Grid<>();
 
   public VerticalLayout get() {
     final VerticalLayout overviewTab = new VerticalLayout();
+    H4 requireZoneStateLabel = new H4("Require zone state");
     prepareRequireZoneStatesGrid();
+
+    H4 lightsLabel = new H4("Lights");
     prepareLightGrid();
 
-    overviewTab.add(requireZoneStatesGrid, lightGrid);
+    H4 motionSensorsLabel = new H4("Motion sensors");
+    prepareMotionSensorsGrid();
+
+    overviewTab.add(
+        requireZoneStateLabel,
+        requireZoneStatesGrid,
+        lightsLabel,
+        lightsGrid,
+        motionSensorsLabel,
+        motionSensorsGrid);
     return overviewTab;
   }
 
   public void refreshDetails(LightsMqttDto lightsMqttDto) {
-    lightGrid.setItems(lightsMqttDto.getLights().values());
-    lightGrid.setHeightFull();
-    lightGrid.setAllRowsVisible(true);
+    lightsGrid.setItems(lightsMqttDto.getLights().values());
+    lightsGrid.setHeightFull();
+    lightsGrid.setAllRowsVisible(true);
     requireZoneStatesGrid.setItems(lightsMqttDto.getRequireZoneStates().entrySet());
     requireZoneStatesGrid.setHeightFull();
     requireZoneStatesGrid.setAllRowsVisible(true);
+    motionSensorsGrid.setItems(lightsMqttDto.getMotionSensors().values());
+    motionSensorsGrid.setHeightFull();
+    motionSensorsGrid.setAllRowsVisible(true);
   }
 
   private void prepareRequireZoneStatesGrid() {
@@ -103,34 +120,38 @@ public class OverviewTab {
                 requireZoneStatesGrid.getColumnByKey("Zone"), SortDirection.ASCENDING)));
   }
 
-  private void prepareLightGrid() {
-    lightGrid.removeAllColumns();
-    lightGrid.addColumn(Light::getLightZone).setKey("Zone").setHeader("Zone");
-    lightGrid
-        .addColumn(light -> light.getLightDevice().getState())
-        .setKey("State")
-        .setHeader("State");
-    lightGrid
-        .addColumn(light -> light.getLightDevice().getBrightness())
-        .setKey("Brightness")
-        .setHeader("Brightness");
-    lightGrid
-        .addColumn(light -> light.getLightDevice().getColorTemperature())
-        .setKey("Color temp")
-        .setHeader("Color temp");
-    lightGrid
-        .addColumn(light -> light.getLightDevice().getIeeeAddress())
+  private void prepareMotionSensorsGrid() {
+    motionSensorsGrid.removeAllColumns();
+    motionSensorsGrid.addColumn(MotionSensor::getLightZone).setKey("Zone").setHeader("Zone");
+    motionSensorsGrid
+        .addColumn(motionSensor -> motionSensor.getSensor().isOccupancy())
+        .setKey("Occupancy")
+        .setHeader("Occupancy");
+    motionSensorsGrid
+        .addColumn(motionSensor -> motionSensor.getSensor().isBatteryLow())
+        .setKey("Low battery")
+        .setHeader("Low battery");
+    motionSensorsGrid
+        .addColumn(motionSensor -> motionSensor.getSensor().getBattery())
+        .setKey("Battery")
+        .setHeader("Battery [%]");
+    motionSensorsGrid
+        .addColumn(motionSensor -> motionSensor.getSensor().getVoltage() / 1000.00d)
+        .setKey("Voltage")
+        .setHeader("Voltage [V]");
+    motionSensorsGrid
+        .addColumn(motionSensor -> motionSensor.getSensor().getIeeeAddress())
         .setKey("Address")
         .setHeader("Address");
-    lightGrid
-        .addColumn(light -> light.getLightDevice().getLinkQuality())
+    motionSensorsGrid
+        .addColumn(motionSensor -> motionSensor.getSensor().getLinkQuality())
         .setKey("link quality")
         .setHeader("link quality");
-    lightGrid
-        .addColumn(light -> light.getLightDevice().getLastUpdateString())
+    motionSensorsGrid
+        .addColumn(motionSensor -> motionSensor.getSensor().getLastUpdateString())
         .setKey("Last update")
         .setHeader("Last update");
-    lightGrid
+    motionSensorsGrid
         .getColumns()
         .forEach(
             column -> {
@@ -138,13 +159,58 @@ public class OverviewTab {
               column.setSortable(true);
               column.setAutoWidth(true);
             });
-    lightGrid.setPageSize(1000);
-    lightGrid.setAllRowsVisible(true);
-    lightGrid.setMultiSort(true);
-    lightGrid.recalculateColumnWidths();
-    lightGrid.sort(
+    motionSensorsGrid.setPageSize(1000);
+    motionSensorsGrid.setAllRowsVisible(true);
+    motionSensorsGrid.setMultiSort(true);
+    motionSensorsGrid.recalculateColumnWidths();
+    motionSensorsGrid.sort(
         Collections.singletonList(
-            new GridSortOrder<>(lightGrid.getColumnByKey("Zone"), SortDirection.ASCENDING)));
+            new GridSortOrder<>(
+                motionSensorsGrid.getColumnByKey("Zone"), SortDirection.ASCENDING)));
+  }
+
+  private void prepareLightGrid() {
+    lightsGrid.removeAllColumns();
+    lightsGrid.addColumn(Light::getLightZone).setKey("Zone").setHeader("Zone");
+    lightsGrid
+        .addColumn(light -> light.getLightDevice().getState())
+        .setKey("State")
+        .setHeader("State");
+    lightsGrid
+        .addColumn(light -> light.getLightDevice().getBrightness())
+        .setKey("Brightness")
+        .setHeader("Brightness");
+    lightsGrid
+        .addColumn(light -> light.getLightDevice().getColorTemperature())
+        .setKey("Color temp")
+        .setHeader("Color temp");
+    lightsGrid
+        .addColumn(light -> light.getLightDevice().getIeeeAddress())
+        .setKey("Address")
+        .setHeader("Address");
+    lightsGrid
+        .addColumn(light -> light.getLightDevice().getLinkQuality())
+        .setKey("link quality")
+        .setHeader("link quality");
+    lightsGrid
+        .addColumn(light -> light.getLightDevice().getLastUpdateString())
+        .setKey("Last update")
+        .setHeader("Last update");
+    lightsGrid
+        .getColumns()
+        .forEach(
+            column -> {
+              column.setResizable(true);
+              column.setSortable(true);
+              column.setAutoWidth(true);
+            });
+    lightsGrid.setPageSize(1000);
+    lightsGrid.setAllRowsVisible(true);
+    lightsGrid.setMultiSort(true);
+    lightsGrid.recalculateColumnWidths();
+    lightsGrid.sort(
+        Collections.singletonList(
+            new GridSortOrder<>(lightsGrid.getColumnByKey("Zone"), SortDirection.ASCENDING)));
   }
 
   private String constructLightModeUrl(LightZone lightZone, Mode mode) {

@@ -14,6 +14,7 @@ public class LightsMqttModuleCreator extends ModuleCreator {
   public ModuleDto createBaseModel() {
     LightsMqttDto lightsMqttDto = new LightsMqttDto();
     lightsMqttDto.setLights(new HashMap<>());
+    lightsMqttDto.setMotionSensors(new HashMap<>());
     lightsMqttDto.setRequireZoneStates(new HashMap<>());
     return lightsMqttDto;
   }
@@ -35,5 +36,6 @@ public class LightsMqttModuleCreator extends ModuleCreator {
 
     lightsMqttDto.getLights().putAll(updateObject.getLights());
     lightsMqttDto.getRequireZoneStates().putAll(updateObject.getRequireZoneStates());
+    lightsMqttDto.getMotionSensors().putAll(updateObject.getMotionSensors());
   }
 }
