@@ -19,7 +19,6 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +31,6 @@ import pl.smarthouse.model.diagnostic.ErrorPredictionDiagnostic;
 import pl.smarthouse.model.diagnostic.ModuleDetails;
 import pl.smarthouse.service.DiagnoseService;
 import pl.smarthouse.service.ErrorHandlingService;
-import pl.smarthouse.service.FirmwareUploadService;
 import pl.smarthouse.views.MainView;
 
 @PageTitle("Smart Portal | Diagnostic")
@@ -52,15 +50,12 @@ public class DiagnosticView extends VerticalLayout {
   private final Label totalErrorCountLabel = new Label();
   private final Label totalModuleDeatilsCountLabel = new Label();
   private final Set<ModuleDetails> modulesDetails = new HashSet<>();
-  private final FirmwareUploadService firmwareUploadService;
 
   public DiagnosticView(
       @Autowired final DiagnoseService diagnoseService,
-      @Autowired final ErrorHandlingService errorHandlingService,
-      @Autowired final FirmwareUploadService firmwareUploadService) {
+      @Autowired final ErrorHandlingService errorHandlingService) {
     this.diagnoseService = diagnoseService;
     this.errorHandlingService = errorHandlingService;
-    this.firmwareUploadService = firmwareUploadService;
     groupErrors.setValue(true);
     createView();
   }
@@ -274,19 +269,7 @@ public class DiagnosticView extends VerticalLayout {
               .forEach(diagnoseService::restartModule);
         });
 
-    final Button uploadTestButton = new Button("uploadTestButton");
-    uploadTestButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-    uploadTestButton.addClickListener(
-        event -> {
-          // TODO
-          try {
-            firmwareUploadService.uploadFirmware();
-          } catch (final IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-        });
-
-    layout.add(totalModuleDeatilsCountLabel, restartAllModulesButton, uploadTestButton);
+    layout.add(totalModuleDeatilsCountLabel, restartAllModulesButton);
     return layout;
   }
 

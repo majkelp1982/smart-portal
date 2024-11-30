@@ -27,7 +27,9 @@ import pl.smarthouse.views.lightsmqtt.tabs.ParamTab;
 public class LightsMqttView extends VerticalLayout {
   private final ParamsService paramsService;
   private final LightsMqttDto lightsMqttDto;
+  private final LightsMqttParamDto lightsMqttParamDto;
   private final OverviewTab overviewTab;
+  private final ParamTab paramTab;
   TabSheet tabs;
 
   public LightsMqttView(
@@ -44,7 +46,13 @@ public class LightsMqttView extends VerticalLayout {
                 .findFirst()
                 .get();
     overviewTab = new OverviewTab(webService, lightsMqttDto);
+
+    lightsMqttParamDto =
+        paramsService.getParams(lightsMqttDto.getServiceAddress(), LightsMqttParamDto.class);
+    paramTab = new ParamTab(webService, lightsMqttParamDto, lightsMqttDto.getServiceAddress());
+
     createView();
+
     overviewTab.refreshDetails(lightsMqttDto);
     UI.getCurrent()
         .addPollListener(
@@ -61,13 +69,11 @@ public class LightsMqttView extends VerticalLayout {
     add(tabs);
     tabs.add("overview", overviewTab.get());
 
-    final LightsMqttParamDto lightsMqttParamDto =
-        paramsService.getParams(lightsMqttDto.getServiceAddress(), LightsMqttParamDto.class);
-    final VerticalLayout paramLayout = new ParamTab().get(lightsMqttParamDto);
-
+    VerticalLayout paramLayout = new VerticalLayout();
     final Button saveButton = new Button("Save all");
     saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     saveButton.addClickListener(buttonClickEvent -> saveAction(lightsMqttDto, lightsMqttParamDto));
+    paramLayout.add(paramTab.get());
     paramLayout.add(saveButton);
     tabs.add("settings", paramLayout);
   }
