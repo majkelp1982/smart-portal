@@ -45,10 +45,10 @@ public class LightsMqttView extends VerticalLayout {
                     moduleDto -> moduleDto.getType().contains(ModuleCreatorType.LIGHTS_MQTT.name()))
                 .findFirst()
                 .get();
-    overviewTab = new OverviewTab(webService, lightsMqttDto);
-
     lightsMqttParamDto =
         paramsService.getParams(lightsMqttDto.getServiceAddress(), LightsMqttParamDto.class);
+    overviewTab = new OverviewTab(webService, lightsMqttDto, lightsMqttParamDto);
+
     paramTab = new ParamTab(webService, lightsMqttParamDto, lightsMqttDto.getServiceAddress());
 
     createView();

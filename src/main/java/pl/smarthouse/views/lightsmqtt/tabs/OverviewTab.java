@@ -8,6 +8,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class OverviewTab {
   private static final Logger log = LoggerFactory.getLogger(OverviewTab.class);
   private final WebService webService;
   private final LightsMqttDto lightsMqttDto;
+  private final LightsMqttParamDto lightsMqttParamDto;
   private final Grid<Map.Entry<LightZone, ZoneState>> requireZoneStatesGrid = new Grid<>();
   private final Grid<Light> lightsGrid = new Grid<>();
   private final Grid<MotionSensor> motionSensorsGrid = new Grid<>();
@@ -103,7 +106,26 @@ public class OverviewTab {
         .setKey("Color temp")
         .setHeader("Color temp");
     requireZoneStatesGrid
-        .addColumn(requireZoneStatesEntry -> requireZoneStatesEntry.getValue().getHoldTimeleft())
+        .addColumn(
+            requireZoneStatesEntry -> {
+              int holdTime =
+                  lightsMqttParamDto
+                      .getZoneParams()
+                      .get(requireZoneStatesEntry.getKey())
+                      .getHoldTime();
+              long timeLeft =
+                  Duration.between(
+                          LocalDateTime.now(),
+                          requireZoneStatesEntry
+                              .getValue()
+                              .getTriggerTimeStamp()
+                              .plusMinutes(holdTime))
+                      .toMinutes();
+              if (timeLeft < 0) {
+                timeLeft = 0;
+              }
+              return timeLeft;
+            })
         .setKey("Hold time left")
         .setHeader("Hold time left[min]");
     requireZoneStatesGrid
