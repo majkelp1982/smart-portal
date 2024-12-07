@@ -3,6 +3,7 @@ package pl.smarthouse.views.lightsmqtt.tabs;
 import static pl.smarthouse.properties.SupportedZigbeeDevicesProperties.SUPPORTED_LIGHTS;
 import static pl.smarthouse.properties.SupportedZigbeeDevicesProperties.SUPPORTED_MOTION_SENSORS;
 
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
@@ -77,14 +78,20 @@ public class ParamTab {
 
   private void enrichWithLightZone(ZigbeeDeviceWithLightZone zigbeeDeviceWithLightZone) {
     String deviceAddress = zigbeeDeviceWithLightZone.getIeeeAddress();
-    Optional.ofNullable(lightsMqttParamDto.getLights().get(deviceAddress))
+    Optional.ofNullable(lightsMqttParamDto.getLights())
+        .map(lights -> lights.get(deviceAddress))
         .ifPresentOrElse(
-            lightZone -> zigbeeDeviceWithLightZone.setLightZone(lightZone.name()),
+            lightZone -> zigbeeDeviceWithLightZone.setLightZones(List.of(lightZone.name())),
             () ->
-                Optional.ofNullable(lightsMqttParamDto.getMotionSensors().get(deviceAddress))
+                Optional.ofNullable(lightsMqttParamDto.getMotionSensors())
+                    .map(motionSensors -> motionSensors.get(deviceAddress))
                     .ifPresentOrElse(
-                        lightZone -> zigbeeDeviceWithLightZone.setLightZone(lightZone.name()),
-                        () -> zigbeeDeviceWithLightZone.setLightZone(NOT_APPLICABLE)));
+                        lightZones -> {
+                          List<String> lightZonesString =
+                              lightZones.stream().map(Enum::name).toList();
+                          zigbeeDeviceWithLightZone.setLightZones(lightZonesString);
+                        },
+                        () -> zigbeeDeviceWithLightZone.setLightZones(List.of(NOT_APPLICABLE))));
   }
 
   private String prepareGetAllDevicesUrl(String serviceAddress) {
@@ -132,25 +139,7 @@ public class ParamTab {
         .setKey("Address")
         .setHeader("address");
     zigbeeDevicesGrid
-        .addColumn(
-            new ComponentRenderer<>(
-                zigbeeDeviceWithLightZone -> {
-                  final HorizontalLayout layout = new HorizontalLayout();
-                  final Select<String> select = new Select<>();
-                  select.setItems(availableZones);
-                  select.setValue(zigbeeDeviceWithLightZone.getLightZone());
-                  select.addValueChangeListener(
-                      event -> {
-                        if (isZigbeeDeviceSupported(zigbeeDeviceWithLightZone)) {
-                          zigbeeDeviceWithLightZone.setLightZone(event.getValue());
-                        } else {
-                          select.setValue(NOT_APPLICABLE);
-                        }
-                        assignLightsAndMotionSensors();
-                      });
-                  layout.add(select);
-                  return layout;
-                }))
+        .addColumn(new ComponentRenderer<>(this::handleZigbeeDevice))
         .setHeader("Light zone");
 
     zigbeeDevicesGrid
@@ -171,14 +160,52 @@ public class ParamTab {
     zigbeeDevicesGrid.setAllRowsVisible(true);
   }
 
+  private HorizontalLayout handleZigbeeDevice(ZigbeeDeviceWithLightZone zigbeeDeviceWithLightZone) {
+    final HorizontalLayout layout = new HorizontalLayout();
+    if (SupportedZigbeeDevicesProperties.SUPPORTED_MOTION_SENSORS.contains(
+        zigbeeDeviceWithLightZone.getDefinition().getModel())) {
+      MultiSelectComboBox<String> multiSelect = new MultiSelectComboBox<>();
+      multiSelect.setItems(availableZones);
+      multiSelect.setValue(zigbeeDeviceWithLightZone.getLightZones());
+      multiSelect.setAutoExpand(MultiSelectComboBox.AutoExpandMode.BOTH);
+      multiSelect.addValueChangeListener(
+          event -> {
+            if (isZigbeeDeviceSupported(zigbeeDeviceWithLightZone)) {
+              zigbeeDeviceWithLightZone.setLightZones(event.getValue().stream().toList());
+            } else {
+              multiSelect.setValue(NOT_APPLICABLE);
+            }
+            assignLightsAndMotionSensors();
+          });
+      layout.add(multiSelect);
+    } else {
+      final Select<String> select = new Select<>();
+      select.setItems(availableZones);
+      select.setValue(zigbeeDeviceWithLightZone.getLightZones().get(0));
+      select.addValueChangeListener(
+          event -> {
+            if (isZigbeeDeviceSupported(zigbeeDeviceWithLightZone)) {
+              zigbeeDeviceWithLightZone.setLightZones(List.of(event.getValue()));
+            } else {
+              select.setValue(NOT_APPLICABLE);
+            }
+            assignLightsAndMotionSensors();
+          });
+      layout.add(select);
+    }
+    return layout;
+  }
+
   private void assignLightsAndMotionSensors() {
+    lightsMqttParamDto.setLights(new HashMap<>());
+    lightsMqttParamDto.setMotionSensors(new HashMap<>());
     List<ZigbeeDeviceWithLightZone> zigbeeDevices =
         zigbeeDevicesGrid
             .getDataProvider()
             .fetch(new Query<>())
             .filter(
                 zigbeeDeviceWithLightZone ->
-                    !zigbeeDeviceWithLightZone.getLightZone().equals(NOT_APPLICABLE))
+                    !zigbeeDeviceWithLightZone.getLightZones().contains(NOT_APPLICABLE))
             .toList();
     zigbeeDevices.stream()
         .filter(
@@ -187,15 +214,11 @@ public class ParamTab {
                     zigbeeDeviceWithLightZone.getDefinition().getModel()))
         .forEach(
             zigbeeDeviceWithLightZone -> {
-              if (lightsMqttParamDto.getLights() == null) {
-                lightsMqttParamDto.setLights(new HashMap<>());
-              }
-
               lightsMqttParamDto
                   .getLights()
                   .put(
                       zigbeeDeviceWithLightZone.getIeeeAddress(),
-                      LightZone.valueOf(zigbeeDeviceWithLightZone.getLightZone()));
+                      LightZone.valueOf(zigbeeDeviceWithLightZone.getLightZones().get(0)));
             });
     zigbeeDevices.stream()
         .filter(
@@ -204,15 +227,13 @@ public class ParamTab {
                     zigbeeDeviceWithLightZone.getDefinition().getModel()))
         .forEach(
             zigbeeDeviceWithLightZone -> {
-              if (lightsMqttParamDto.getMotionSensors() == null) {
-                lightsMqttParamDto.setMotionSensors(new HashMap<>());
-              }
-
               lightsMqttParamDto
                   .getMotionSensors()
                   .put(
                       zigbeeDeviceWithLightZone.getIeeeAddress(),
-                      LightZone.valueOf(zigbeeDeviceWithLightZone.getLightZone()));
+                      zigbeeDeviceWithLightZone.getLightZones().stream()
+                          .map(LightZone::valueOf)
+                          .toList());
             });
   }
 
@@ -253,6 +274,6 @@ public class ParamTab {
   @Setter
   @Getter
   private static class ZigbeeDeviceWithLightZone extends ZigbeeDevice {
-    private String lightZone;
+    private List<String> lightZones;
   }
 }

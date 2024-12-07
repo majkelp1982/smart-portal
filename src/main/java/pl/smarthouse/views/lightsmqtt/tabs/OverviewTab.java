@@ -148,7 +148,7 @@ public class OverviewTab {
 
   private void prepareMotionSensorsGrid() {
     motionSensorsGrid.removeAllColumns();
-    motionSensorsGrid.addColumn(MotionSensor::getLightZone).setKey("Zone").setHeader("Zone");
+    motionSensorsGrid.addColumn(MotionSensor::getLightZones).setKey("Zones").setHeader("Zones");
     motionSensorsGrid
         .addColumn(motionSensor -> motionSensor.getSensor().isOccupancy())
         .setKey("Occupancy")
@@ -189,10 +189,6 @@ public class OverviewTab {
     motionSensorsGrid.setAllRowsVisible(true);
     motionSensorsGrid.setMultiSort(true);
     motionSensorsGrid.recalculateColumnWidths();
-    motionSensorsGrid.sort(
-        Collections.singletonList(
-            new GridSortOrder<>(
-                motionSensorsGrid.getColumnByKey("Zone"), SortDirection.ASCENDING)));
   }
 
   private void prepareLightGrid() {
@@ -234,9 +230,6 @@ public class OverviewTab {
     lightsGrid.setAllRowsVisible(true);
     lightsGrid.setMultiSort(true);
     lightsGrid.recalculateColumnWidths();
-    lightsGrid.sort(
-        Collections.singletonList(
-            new GridSortOrder<>(lightsGrid.getColumnByKey("Zone"), SortDirection.ASCENDING)));
   }
 
   private String constructLightModeUrl(LightZone lightZone, Mode mode) {
