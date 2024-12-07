@@ -15,7 +15,6 @@ import com.vaadin.flow.router.RouterLink;
 import pl.smarthouse.views.charts.ChartsView;
 import pl.smarthouse.views.comfort.ComfortView;
 import pl.smarthouse.views.diagnostic.DiagnosticView;
-import pl.smarthouse.views.externallights.ExternalLightsView;
 import pl.smarthouse.views.fireplace.FireplaceView;
 import pl.smarthouse.views.lightsmqtt.LightsMqttView;
 import pl.smarthouse.views.ventilation.VentilationView;
@@ -45,8 +44,6 @@ public class MainView extends AppLayout {
         createDrawerElement("recu.svg", "Ventilation", VentilationView.class);
     final RouterLink weatherViewLink =
         createDrawerElement("cloud.svg", "Weather", WeatherView.class);
-    final RouterLink externalLightsViewLink =
-        createDrawerElement("light-bulb.svg", "External lights", ExternalLightsView.class);
     final RouterLink lightsMqttViewLink =
         createDrawerElement("light-bulb.svg", "Lights", LightsMqttView.class);
     final RouterLink fireplaceViewLink =
@@ -59,7 +56,6 @@ public class MainView extends AppLayout {
         comfortViewLink,
         ventViewLink,
         weatherViewLink,
-        externalLightsViewLink,
         lightsMqttViewLink,
         fireplaceViewLink,
         chartsViewLink,
