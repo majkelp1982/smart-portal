@@ -120,14 +120,14 @@ public class OverviewTab {
                               .getValue()
                               .getTriggerTimeStamp()
                               .plusMinutes(holdTime))
-                      .toMinutes();
+                      .toSeconds();
               if (timeLeft < 0) {
                 timeLeft = 0;
               }
               return timeLeft;
             })
         .setKey("Hold time left")
-        .setHeader("Hold time left[min]");
+        .setHeader("Hold time left[s]");
     requireZoneStatesGrid
         .getColumns()
         .forEach(
