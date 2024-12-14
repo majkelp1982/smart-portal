@@ -43,6 +43,7 @@ public class VentilationView extends VerticalLayout {
     valueContainer = new ValueContainer(ventModuleDto);
 
     createView();
+    valueContainer.updateValues();
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {

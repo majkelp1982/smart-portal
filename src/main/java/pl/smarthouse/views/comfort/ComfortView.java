@@ -48,12 +48,13 @@ public class ComfortView extends VerticalLayout {
     this.moduleService = moduleService;
     this.paramsService = paramsService;
     createView();
+    valueContainerMap.values().forEach(ValueContainer::updateValues);
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
               if (isAttached()) {
                 log.info("Pool listener triggered for class: {}", this.getClass().toString());
-                valueContainerMap.values().stream().forEach(ValueContainer::updateValues);
+                valueContainerMap.values().forEach(ValueContainer::updateValues);
               }
             });
   }

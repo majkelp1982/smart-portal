@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.core.Bme280ResponseDto;
-import pl.smarthouse.sharedobjects.dto.core.PinResponseDto;
 import pl.smarthouse.sharedobjects.dto.core.Sds011ResponseDto;
+import pl.smarthouse.sharedobjects.dto.weather.Sun;
 import pl.smarthouse.sharedobjects.dto.weather.WeatherModuleDto;
 import pl.smarthouse.utils.CreatorUtils;
 
@@ -18,7 +18,7 @@ public class WeatherModuleCreator extends ModuleCreator {
     return WeatherModuleDto.builder()
         .sds011Response(Sds011ResponseDto.builder().build())
         .bme280Response(Bme280ResponseDto.builder().build())
-        .lightIntense(PinResponseDto.builder().build())
+        .sun(new Sun())
         .build();
   }
 
@@ -52,6 +52,6 @@ public class WeatherModuleCreator extends ModuleCreator {
     sds011ResponseDto.setPm025(sds011Update.getPm025());
 
     // LightIntense
-    weatherModuleDto.setLightIntense(updateObject.getLightIntense());
+    weatherModuleDto.setSun(updateObject.getSun());
   }
 }

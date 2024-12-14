@@ -47,6 +47,7 @@ public class FireplaceView extends VerticalLayout {
     valueContainer = new ValueContainer(fireplaceModuleDto);
 
     createView();
+    valueContainer.updateValues();
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {

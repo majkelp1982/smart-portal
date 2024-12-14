@@ -10,6 +10,10 @@ public enum ComponentColor {
   NORMAL("white"),
   NEW("orange"),
 
+  // Sun
+  SET("black"),
+  RISE("yellow"),
+
   // Switch
   OFF("grey"),
   ON("lime"),

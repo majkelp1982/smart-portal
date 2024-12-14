@@ -36,6 +36,7 @@ public class WeatherView extends VerticalLayout {
     valueContainer = new ValueContainer(weatherModuleDto);
 
     createView();
+    valueContainer.updateValues();
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
@@ -50,7 +51,7 @@ public class WeatherView extends VerticalLayout {
     final HorizontalLayout layout = new HorizontalLayout();
     layout.add(airPollution(), airTile());
 
-    add(layout, lightIntenseTile());
+    add(layout, sunTile());
   }
 
   private Tile airPollution() {
@@ -85,15 +86,12 @@ public class WeatherView extends VerticalLayout {
     return Bme280Tile.getTile(new Label("Air"), "bme280Response", valueContainer);
   }
 
-  private Tile lightIntenseTile() {
-    final Tile tile = new Tile("sun.svg", new Label("Light intense"));
-    final Info lightIntense = new Info("light intense", "%");
-    final Info error = new Info("error");
-    ColorPredicates.assignToError(error);
-
-    valueContainer.put("lightIntense.pinValue", lightIntense);
-    valueContainer.put("lightIntense.!error", error);
-    tile.getDetailsContainer().add(lightIntense.getLayout());
+  private Tile sunTile() {
+    final Tile tile = new Tile("sun.svg", new Label("Sun"));
+    final Info state = new Info("state");
+    ColorPredicates.assignToSun(state);
+    valueContainer.put("sun.sunState", state);
+    tile.getDetailsContainer().add(state.getLayout());
     return tile;
   }
 

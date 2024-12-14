@@ -13,6 +13,7 @@ import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRangeMode;
 import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.ThrottleState;
+import pl.smarthouse.sharedobjects.dto.weather.SunState;
 import pl.smarthouse.sharedobjects.enums.Operation;
 
 @UtilityClass
@@ -64,6 +65,15 @@ public class ColorPredicates {
     info.addColorPredicates(
         component -> Double.valueOf(component.getValue().toString()) >= alarm,
         ComponentColor.ALARM);
+  }
+
+  public void assignToSun(final Info info) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OK);
+    info.addColorPredicates(
+        component -> SunState.SET.equals(component.getValue()), ComponentColor.SET);
+    info.addColorPredicates(
+        component -> SunState.RISE.equals(component.getValue()), ComponentColor.RISE);
   }
 
   public void assignToCurrentOperation(final Info info) {

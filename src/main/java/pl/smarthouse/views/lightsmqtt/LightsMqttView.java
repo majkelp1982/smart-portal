@@ -52,7 +52,6 @@ public class LightsMqttView extends VerticalLayout {
     paramTab = new ParamTab(webService, lightsMqttParamDto, lightsMqttDto.getServiceAddress());
 
     createView();
-
     overviewTab.refreshDetails(lightsMqttDto);
     UI.getCurrent()
         .addPollListener(
