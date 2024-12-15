@@ -2,6 +2,7 @@ package pl.smarthouse.components;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import pl.smarthouse.exceptions.ValueContainerException;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 
 public class ValueContainer {
+  public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
   Object moduleDto;
   HashMap<String, PortalComponent> valueContainer = new HashMap<>();
 
@@ -32,10 +34,19 @@ public class ValueContainer {
             if (value instanceof LocalDateTime) {
               final String strValue =
                   ((LocalDateTime) value)
-                      .format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+                      .format(TIME_FORMATTER)
                       .toString();
               component.setValue(strValue);
-            } else if (!(value instanceof Enum)
+            } else
+            if (value instanceof LocalTime) {
+              final String strValue =
+                      ((LocalTime) value)
+                              .format(TIME_FORMATTER)
+                              .toString();
+              component.setValue(strValue);
+
+            }
+            else if (!(value instanceof Enum)
                 && (path.contains("pressure") || path.contains("temp"))) {
               final double roundOff =
                   (double) Math.round(Double.parseDouble(value.toString()) * 100) / 100;

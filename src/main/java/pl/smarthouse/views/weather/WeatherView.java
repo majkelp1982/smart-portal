@@ -88,10 +88,14 @@ public class WeatherView extends VerticalLayout {
 
   private Tile sunTile() {
     final Tile tile = new Tile("sun.svg", new Label("Sun"));
-    final Info state = new Info("state");
-    ColorPredicates.assignToSun(state);
-    valueContainer.put("sun.sunState", state);
-    tile.getDetailsContainer().add(state.getLayout());
+    final Info sunRiseTimestamp = new Info("rise time");
+    final Info sunSetTimestamp = new Info("set time");
+    final Info sunState = new Info("state");
+    ColorPredicates.assignToSun(sunState);
+    valueContainer.put("sun.sunRise", sunRiseTimestamp);
+    valueContainer.put("sun.sunSet", sunSetTimestamp);
+    valueContainer.put("sun.sunState", sunState);
+    tile.getDetailsContainer().add(sunRiseTimestamp.getLayout(), sunSetTimestamp.getLayout(),sunState.getLayout());
     return tile;
   }
 

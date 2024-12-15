@@ -11,8 +11,8 @@ public enum ComponentColor {
   NEW("orange"),
 
   // Sun
-  SET("black"),
-  RISE("yellow"),
+  SET("grey"),
+  RISE("gold"),
 
   // Switch
   OFF("grey"),
