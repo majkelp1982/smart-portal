@@ -95,7 +95,8 @@ public class WeatherView extends VerticalLayout {
     valueContainer.put("sun.sunRise", sunRiseTimestamp);
     valueContainer.put("sun.sunSet", sunSetTimestamp);
     valueContainer.put("sun.sunState", sunState);
-    tile.getDetailsContainer().add(sunRiseTimestamp.getLayout(), sunSetTimestamp.getLayout(),sunState.getLayout());
+    tile.getDetailsContainer()
+        .add(sunRiseTimestamp.getLayout(), sunSetTimestamp.getLayout(), sunState.getLayout());
     return tile;
   }
 

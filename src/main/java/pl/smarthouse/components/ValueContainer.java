@@ -32,21 +32,13 @@ public class ValueContainer {
           final var value = getFieldValue(path);
           if (Objects.nonNull(value)) {
             if (value instanceof LocalDateTime) {
-              final String strValue =
-                  ((LocalDateTime) value)
-                      .format(TIME_FORMATTER)
-                      .toString();
+              final String strValue = ((LocalDateTime) value).format(TIME_FORMATTER).toString();
               component.setValue(strValue);
-            } else
-            if (value instanceof LocalTime) {
-              final String strValue =
-                      ((LocalTime) value)
-                              .format(TIME_FORMATTER)
-                              .toString();
+            } else if (value instanceof LocalTime) {
+              final String strValue = ((LocalTime) value).format(TIME_FORMATTER).toString();
               component.setValue(strValue);
 
-            }
-            else if (!(value instanceof Enum)
+            } else if (!(value instanceof Enum)
                 && (path.contains("pressure") || path.contains("temp"))) {
               final double roundOff =
                   (double) Math.round(Double.parseDouble(value.toString()) * 100) / 100;
