@@ -21,7 +21,7 @@ import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.fireplace.tabs.OverviewTab;
 import pl.smarthouse.views.fireplace.tabs.ParamTab;
 
-@PageTitle("Smart Portal | External lights")
+@PageTitle("Smart Portal | Fireplace")
 @Route(value = "Fireplace", layout = MainView.class)
 @Slf4j
 public class FireplaceView extends VerticalLayout {
