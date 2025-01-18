@@ -146,6 +146,16 @@
             <groupId>pl.smarthouse</groupId>
             <artifactId>shared-objects</artifactId>
             <version>1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>pl.smarthouse</groupId>
+                    <artifactId>smart-module</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>pl.smarthouse</groupId>
+                    <artifactId>smart-monitoring</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -156,6 +166,11 @@
             <groupId>com.github.appreciated</groupId>
             <artifactId>apexcharts</artifactId>
             <version>23.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.1.1</version>
         </dependency>
     </dependencies>
 
