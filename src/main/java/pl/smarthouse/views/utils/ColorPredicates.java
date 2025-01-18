@@ -10,6 +10,7 @@ import pl.smarthouse.components.Label;
 import pl.smarthouse.components.PortalComponent;
 import pl.smarthouse.model.ComponentColor;
 import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRangeMode;
+import pl.smarthouse.sharedobjects.dto.core.enums.SpaDeviceState;
 import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.ThrottleState;
@@ -92,6 +93,18 @@ public class ColorPredicates {
     info.addColorPredicates(component -> onModes.contains(component.getValue()), ComponentColor.ON);
     info.addColorPredicates(
         component -> Mode.COOLING.equals(component.getValue()), ComponentColor.WARNING);
+  }
+
+  public void assignToSpaDeviceRelayState(final Info info) {
+    info.setColorEnabled(true);
+    info.setDefaultColor(ComponentColor.OFF);
+    info.addColorPredicates(
+        component -> SpaDeviceState.OFF.equals(component.getValue()), ComponentColor.OFF);
+    info.addColorPredicates(
+        component -> SpaDeviceState.ON.equals(component.getValue()), ComponentColor.ON);
+    info.addColorPredicates(
+        component -> SpaDeviceState.MIN_TEMP_REQ.equals(component.getValue()),
+        ComponentColor.WARNING);
   }
 
   public void assignToTimeRangeMode(final Info info) {

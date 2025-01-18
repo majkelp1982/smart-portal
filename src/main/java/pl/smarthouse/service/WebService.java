@@ -1,5 +1,6 @@
 package pl.smarthouse.service;
 
+import com.vaadin.flow.server.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -7,7 +8,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -49,11 +49,11 @@ public class WebService {
       return clientResponse.bodyToFlux(clazz);
     } else {
       return clientResponse
-          .createError()
-          .flatMapMany(
+          .bodyToFlux(String.class)
+          .flatMap(
               error -> {
                 log.error("Error while processing response: {}", error);
-                return Mono.error((Throwable) error);
+                return Flux.error(new ServiceException(error));
               });
     }
   }

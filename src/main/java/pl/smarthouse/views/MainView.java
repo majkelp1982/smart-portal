@@ -13,6 +13,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import pl.smarthouse.views.charts.ChartsView;
+import pl.smarthouse.views.chillzone.ChillZoneView;
 import pl.smarthouse.views.comfort.ComfortView;
 import pl.smarthouse.views.diagnostic.DiagnosticView;
 import pl.smarthouse.views.fireplace.FireplaceView;
@@ -48,6 +49,8 @@ public class MainView extends AppLayout {
         createDrawerElement("light-bulb.svg", "Lights", LightsMqttView.class);
     final RouterLink fireplaceViewLink =
         createDrawerElement("fireplace.svg", "Fireplace", FireplaceView.class);
+    final RouterLink chillZoneViewLink =
+        createDrawerElement("batteryCharging.svg", "Chill", ChillZoneView.class);
     final RouterLink chartsViewLink = createDrawerElement("graph.svg", "Charts", ChartsView.class);
     final RouterLink diagnosticViewLink =
         createDrawerElement("support.svg", "Diagnostic", DiagnosticView.class);
@@ -58,6 +61,7 @@ public class MainView extends AppLayout {
         weatherViewLink,
         lightsMqttViewLink,
         fireplaceViewLink,
+        chillZoneViewLink,
         chartsViewLink,
         diagnosticViewLink);
     addToDrawer(drawer);

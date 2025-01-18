@@ -37,6 +37,7 @@ public class Button extends PortalComponent {
   public void setValue(final Object value) {
     this.value = value;
     super.setColor();
+    nameButton.setText(value.toString());
     nameButton.getStyle().set("color", component.getStyle().get("color"));
   }
 }
