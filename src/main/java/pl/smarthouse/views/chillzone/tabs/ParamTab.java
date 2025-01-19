@@ -11,12 +11,13 @@ import pl.smarthouse.components.params.TemperatureField;
 import pl.smarthouse.sharedobjects.dto.chillzone.ChillZoneParamModuleDto;
 import pl.smarthouse.sharedobjects.dto.chillzone.SpaDeviceParam;
 
-public class ParamTab extends VerticalLayout {
+public class ParamTab {
 
   public VerticalLayout get(final ChillZoneParamModuleDto chillZoneParamModuleDto) {
-    add(spaDeviceParamDetails("Sauna", chillZoneParamModuleDto.getSauna()));
-    add(spaDeviceParamDetails("Chill room", chillZoneParamModuleDto.getChillRoom()));
-    return this;
+    final VerticalLayout layout = new VerticalLayout();
+    layout.add(spaDeviceParamDetails("Sauna", chillZoneParamModuleDto.getSauna()));
+    layout.add(spaDeviceParamDetails("Chill room", chillZoneParamModuleDto.getChillRoom()));
+    return layout;
   }
 
   private Details spaDeviceParamDetails(String spaDeviceName, SpaDeviceParam spaDeviceParam) {

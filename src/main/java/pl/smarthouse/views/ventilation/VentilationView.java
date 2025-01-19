@@ -21,6 +21,8 @@ import pl.smarthouse.views.ventilation.tabs.OverviewTab;
 import pl.smarthouse.views.ventilation.tabs.ParamTab;
 import pl.smarthouse.views.ventilation.tabs.ZoneTab;
 
+import static pl.smarthouse.service.module.ModuleCreatorType.VENTILATION;
+
 @PageTitle("Smart Portal | Ventilation")
 @Route(value = "Ventilation", layout = MainView.class)
 @Slf4j
@@ -37,7 +39,7 @@ public class VentilationView extends VerticalLayout {
     ventModuleDto =
         (VentModuleDto)
             moduleService.getModuleDtos().stream()
-                .filter(moduleDto -> moduleDto.getType().contains("VENTILATION"))
+                .filter(moduleDto -> moduleDto.getType().contains(VENTILATION.name()))
                 .findFirst()
                 .get();
     valueContainer = new ValueContainer(ventModuleDto);

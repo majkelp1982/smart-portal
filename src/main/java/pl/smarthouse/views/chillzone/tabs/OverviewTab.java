@@ -16,13 +16,14 @@ import pl.smarthouse.views.utils.ColorPredicates;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class OverviewTab extends VerticalLayout {
+public class OverviewTab {
   private final ValueContainer valueContainer;
   private final ChillZoneModuleDto chillZoneModuleDto;
   private final ChillZoneParamModuleDto chillZoneModuleParamsDto;
   private final WebService webService;
 
   public VerticalLayout get() {
+    final VerticalLayout overviewTab = new VerticalLayout();
     Tile sauna =
         createSpaDeviceOverview(
             "Sauna", "sauna", chillZoneModuleDto.getSauna(), chillZoneModuleParamsDto.getSauna());
@@ -32,8 +33,8 @@ public class OverviewTab extends VerticalLayout {
             "chillRoom",
             chillZoneModuleDto.getChillRoom(),
             chillZoneModuleParamsDto.getChillRoom());
-    add(sauna, chillRoom);
-    return this;
+    overviewTab.add(sauna, chillRoom);
+    return overviewTab;
   }
 
   private Tile createSpaDeviceOverview(

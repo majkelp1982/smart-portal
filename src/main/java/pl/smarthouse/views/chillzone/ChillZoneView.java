@@ -21,15 +21,17 @@ import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.chillzone.tabs.OverviewTab;
 import pl.smarthouse.views.chillzone.tabs.ParamTab;
 
+import static pl.smarthouse.service.module.ModuleCreatorType.CHILL_ZONE;
+
 @PageTitle("Smart Portal | Chill zone")
-@Route(value = "ChillZone", layout = MainView.class)
+@Route(value = "chillzone", layout = MainView.class)
 @Slf4j
 public class ChillZoneView extends VerticalLayout {
   private final ParamsService paramsService;
   private final WebService webService;
   private final ValueContainer valueContainer;
   private final ChillZoneModuleDto chillZoneModuleDto;
-  TabSheet tabs = new TabSheet();
+  TabSheet tabs;
 
   public ChillZoneView(
       @Autowired final ModuleService moduleService,
@@ -41,7 +43,7 @@ public class ChillZoneView extends VerticalLayout {
     chillZoneModuleDto =
         (ChillZoneModuleDto)
             moduleService.getModuleDtos().stream()
-                .filter(moduleDto -> moduleDto.getType().contains("CHILL_ZONE"))
+                .filter(moduleDto -> moduleDto.getType().contains(CHILL_ZONE.name()))
                 .findFirst()
                 .get();
     valueContainer = new ValueContainer(chillZoneModuleDto);
@@ -59,6 +61,7 @@ public class ChillZoneView extends VerticalLayout {
   }
 
   private void createView() {
+     tabs = new TabSheet();
     add(tabs);
     final ChillZoneParamModuleDto chillZoneModuleParamsDto =
         paramsService.getParams(

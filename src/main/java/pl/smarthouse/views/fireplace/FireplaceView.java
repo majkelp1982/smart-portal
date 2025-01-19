@@ -21,6 +21,8 @@ import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.fireplace.tabs.OverviewTab;
 import pl.smarthouse.views.fireplace.tabs.ParamTab;
 
+import static pl.smarthouse.service.module.ModuleCreatorType.FIREPLACE;
+
 @PageTitle("Smart Portal | Fireplace")
 @Route(value = "Fireplace", layout = MainView.class)
 @Slf4j
@@ -41,7 +43,7 @@ public class FireplaceView extends VerticalLayout {
     fireplaceModuleDto =
         (FireplaceModuleDto)
             moduleService.getModuleDtos().stream()
-                .filter(moduleDto -> moduleDto.getType().contains("FIREPLACE"))
+                .filter(moduleDto -> moduleDto.getType().contains(FIREPLACE.name()))
                 .findFirst()
                 .get();
     valueContainer = new ValueContainer(fireplaceModuleDto);

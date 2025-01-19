@@ -31,6 +31,8 @@ import pl.smarthouse.views.comfort.subview.HumidityAlertView;
 import pl.smarthouse.views.comfort.subview.TemperatureControlView;
 import pl.smarthouse.views.utils.ColorPredicates;
 
+import static pl.smarthouse.service.module.ModuleCreatorType.COMFORT;
+
 @PageTitle("Smart Portal | Comfort")
 @Route(value = "Comfort", layout = MainView.class)
 @Slf4j
@@ -78,7 +80,7 @@ public class ComfortView extends VerticalLayout {
     add(tabs);
 
     moduleService.getModuleDtos().stream()
-        .filter(moduleDto -> moduleDto.getType().contains("COMFORT"))
+        .filter(moduleDto -> moduleDto.getType().contains(COMFORT.name()))
         .sorted(Comparator.comparing(ModuleDto::getType))
         .map(moduleDto -> (ComfortModuleDto) moduleDto)
         .forEach(this::createZoneTab);

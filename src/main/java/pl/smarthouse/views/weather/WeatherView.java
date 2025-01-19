@@ -19,6 +19,8 @@ import pl.smarthouse.sharedobjects.dto.weather.WeatherModuleDto;
 import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.utils.ColorPredicates;
 
+import static pl.smarthouse.service.module.ModuleCreatorType.WEATHER;
+
 @PageTitle("Smart Portal | Weather")
 @Route(value = "Weather", layout = MainView.class)
 @Slf4j
@@ -30,7 +32,7 @@ public class WeatherView extends VerticalLayout {
     weatherModuleDto =
         (WeatherModuleDto)
             moduleService.getModuleDtos().stream()
-                .filter(moduleDto -> moduleDto.getType().contains("WEATHER"))
+                .filter(moduleDto -> moduleDto.getType().contains(WEATHER.name()))
                 .findFirst()
                 .get();
     valueContainer = new ValueContainer(weatherModuleDto);
