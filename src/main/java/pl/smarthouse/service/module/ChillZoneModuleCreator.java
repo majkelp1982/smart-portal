@@ -2,7 +2,6 @@ package pl.smarthouse.service.module;
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import pl.smarthouse.sharedobjects.dto.ModuleDto;
 import pl.smarthouse.sharedobjects.dto.chillzone.ChillZoneModuleDto;
@@ -15,7 +14,6 @@ import pl.smarthouse.utils.CreatorUtils;
 @Component
 @RequiredArgsConstructor
 public class ChillZoneModuleCreator extends ModuleCreator {
-  private final ModelMapper modelMapper;
 
   @Override
   public ModuleDto createBaseModel() {

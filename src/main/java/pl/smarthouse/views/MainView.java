@@ -50,7 +50,7 @@ public class MainView extends AppLayout {
     final RouterLink fireplaceViewLink =
         createDrawerElement("fireplace.svg", "Fireplace", FireplaceView.class);
     final RouterLink chillZoneViewLink =
-        createDrawerElement("batteryCharging.svg", "Chill", ChillZoneView.class);
+        createDrawerElement("sunbed.svg", "Chill", ChillZoneView.class);
     final RouterLink chartsViewLink = createDrawerElement("graph.svg", "Charts", ChartsView.class);
     final RouterLink diagnosticViewLink =
         createDrawerElement("support.svg", "Diagnostic", DiagnosticView.class);
