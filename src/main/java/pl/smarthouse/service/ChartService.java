@@ -156,7 +156,7 @@ public class ChartService {
         return IntNode.valueOf(0);
       }
 
-      case "ON", "STANDBY" -> {
+      case "STANDBY" -> {
         return IntNode.valueOf(1);
       }
       case "HUMIDITY_ALERT" -> {
@@ -165,16 +165,16 @@ public class ChartService {
       case "AIR_EXCHANGE" -> {
         return IntNode.valueOf(3);
       }
-      case "AIR_HEATING" -> {
+      case "MIN_TEMP_REQ", "AIR_HEATING" -> {
         return IntNode.valueOf(4);
       }
-      case "AIR_COOLING" -> {
+      case "FLOOR_HEATING" -> {
         return IntNode.valueOf(5);
       }
       case "AIR_CONDITION" -> {
         return IntNode.valueOf(6);
       }
-      case "FLOOR_HEATING" -> {
+      case "ON", "AIR_COOLING" -> {
         return IntNode.valueOf(7);
       }
     }

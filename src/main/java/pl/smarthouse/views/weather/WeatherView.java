@@ -1,5 +1,7 @@
 package pl.smarthouse.views.weather;
 
+import static pl.smarthouse.service.module.ModuleCreatorType.WEATHER;
+
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
@@ -18,8 +20,6 @@ import pl.smarthouse.service.module.ModuleService;
 import pl.smarthouse.sharedobjects.dto.weather.WeatherModuleDto;
 import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.utils.ColorPredicates;
-
-import static pl.smarthouse.service.module.ModuleCreatorType.WEATHER;
 
 @PageTitle("Smart Portal | Weather")
 @Route(value = "Weather", layout = MainView.class)

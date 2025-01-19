@@ -1,5 +1,7 @@
 package pl.smarthouse.views.fireplace;
 
+import static pl.smarthouse.service.module.ModuleCreatorType.FIREPLACE;
+
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
@@ -20,8 +22,6 @@ import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleParamsDto;
 import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.fireplace.tabs.OverviewTab;
 import pl.smarthouse.views.fireplace.tabs.ParamTab;
-
-import static pl.smarthouse.service.module.ModuleCreatorType.FIREPLACE;
 
 @PageTitle("Smart Portal | Fireplace")
 @Route(value = "Fireplace", layout = MainView.class)

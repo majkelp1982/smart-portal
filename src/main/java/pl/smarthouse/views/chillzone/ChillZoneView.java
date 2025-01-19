@@ -1,5 +1,7 @@
 package pl.smarthouse.views.chillzone;
 
+import static pl.smarthouse.service.module.ModuleCreatorType.CHILL_ZONE;
+
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
@@ -61,7 +63,7 @@ public class ChillZoneView extends VerticalLayout {
   }
 
   private void createView() {
-     tabs = new TabSheet();
+    tabs = new TabSheet();
     add(tabs);
     final ChillZoneParamModuleDto chillZoneModuleParamsDto =
         paramsService.getParams(

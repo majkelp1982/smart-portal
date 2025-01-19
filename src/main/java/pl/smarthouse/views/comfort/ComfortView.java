@@ -1,5 +1,7 @@
 package pl.smarthouse.views.comfort;
 
+import static pl.smarthouse.service.module.ModuleCreatorType.COMFORT;
+
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
@@ -30,8 +32,6 @@ import pl.smarthouse.views.comfort.subview.AirExchangerView;
 import pl.smarthouse.views.comfort.subview.HumidityAlertView;
 import pl.smarthouse.views.comfort.subview.TemperatureControlView;
 import pl.smarthouse.views.utils.ColorPredicates;
-
-import static pl.smarthouse.service.module.ModuleCreatorType.COMFORT;
 
 @PageTitle("Smart Portal | Comfort")
 @Route(value = "Comfort", layout = MainView.class)

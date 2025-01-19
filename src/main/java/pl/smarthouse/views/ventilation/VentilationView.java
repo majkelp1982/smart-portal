@@ -1,5 +1,7 @@
 package pl.smarthouse.views.ventilation;
 
+import static pl.smarthouse.service.module.ModuleCreatorType.VENTILATION;
+
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
@@ -20,8 +22,6 @@ import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.ventilation.tabs.OverviewTab;
 import pl.smarthouse.views.ventilation.tabs.ParamTab;
 import pl.smarthouse.views.ventilation.tabs.ZoneTab;
-
-import static pl.smarthouse.service.module.ModuleCreatorType.VENTILATION;
 
 @PageTitle("Smart Portal | Ventilation")
 @Route(value = "Ventilation", layout = MainView.class)
