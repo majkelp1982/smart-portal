@@ -23,8 +23,6 @@ import pl.smarthouse.views.MainView;
 import pl.smarthouse.views.chillzone.tabs.OverviewTab;
 import pl.smarthouse.views.chillzone.tabs.ParamTab;
 
-import static pl.smarthouse.service.module.ModuleCreatorType.CHILL_ZONE;
-
 @PageTitle("Smart Portal | Chill zone")
 @Route(value = "chillzone", layout = MainView.class)
 @Slf4j
