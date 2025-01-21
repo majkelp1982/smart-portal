@@ -53,6 +53,7 @@ public class ChillZoneModuleCreator extends ModuleCreator {
   private void updateSpaDevice(SpaDevice device, SpaDevice updateObject) {
     device.setState(updateObject.getState());
     device.setRelayState(updateObject.getRelayState());
+    device.setLeftHoldTimeInMinutes(updateObject.getLeftHoldTimeInMinutes());
     CreatorUtils.updateBme280(device.getBme280ResponseDto(), updateObject.getBme280ResponseDto());
   }
 }

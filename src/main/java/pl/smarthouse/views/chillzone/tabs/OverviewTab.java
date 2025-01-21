@@ -54,13 +54,18 @@ public class OverviewTab {
         .getSource()
         .addClickListener(
             event -> {
-              spaDevice.setState(spaDevice.getState().equals(State.ON) ? State.OFF : State.ON);
-              stateButton.setValue(spaDevice.getState().toString());
               webService
                   .patch(constructSpaDeviceTriggerUrl(valueContainerName), String.class, "")
+                  .doOnNext(
+                      singal -> {
+                        spaDevice.setState(
+                            spaDevice.getState().equals(State.ON) ? State.OFF : State.ON);
+                        stateButton.setValue(spaDevice.getState().toString());
+                      })
                   .onErrorResume(
                       throwable -> {
-                        Notification notification = new Notification(throwable.getMessage());
+                        Notification notification = new Notification();
+                        notification.setText(throwable.getMessage());
                         notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
                         notification.open();
                         return Mono.empty();
@@ -71,6 +76,8 @@ public class OverviewTab {
 
     final Info relayState = new Info("Relay");
     ColorPredicates.assignToSpaDeviceRelayState(relayState);
+    final Info timeLeft = new Info("time left", "min");
+
     final Info temperature = new Info("temp", "°C");
 
     if (State.ON.equals(spaDevice.getState())) {
@@ -89,6 +96,7 @@ public class OverviewTab {
         .add(
             stateButton.getLayout(),
             relayState.getLayout(),
+            timeLeft.getLayout(),
             temperature.getLayout(),
             pressure.getLayout(),
             humidity.getLayout(),
@@ -96,7 +104,9 @@ public class OverviewTab {
             update.getLayout());
 
     // Values
+    valueContainer.put(valueContainerName + ".state", stateButton);
     valueContainer.put(valueContainerName + ".relayState", relayState);
+    valueContainer.put(valueContainerName + ".leftHoldTimeInMinutes", timeLeft);
     valueContainer.put(valueContainerName + ".bme280ResponseDto.temperature", temperature);
     valueContainer.put(valueContainerName + ".bme280ResponseDto.pressure", pressure);
     valueContainer.put(valueContainerName + ".bme280ResponseDto.humidity", humidity);
