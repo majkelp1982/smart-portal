@@ -7,6 +7,8 @@ import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.router.PageTitle;
@@ -31,6 +33,7 @@ public class ChillZoneView extends VerticalLayout {
   private final WebService webService;
   private final ValueContainer valueContainer;
   private final ChillZoneModuleDto chillZoneModuleDto;
+  private OverviewTab overviewTab;
   TabSheet tabs;
 
   public ChillZoneView(
@@ -53,6 +56,9 @@ public class ChillZoneView extends VerticalLayout {
     UI.getCurrent()
         .addPollListener(
             pollEvent -> {
+              if (overviewTab != null) {
+                overviewTab.handleNotification();
+              }
               if (isAttached()) {
                 log.info("Pool listener triggered for class: {}", this.getClass());
                 valueContainer.updateValues();
@@ -66,10 +72,9 @@ public class ChillZoneView extends VerticalLayout {
     final ChillZoneParamModuleDto chillZoneModuleParamsDto =
         paramsService.getParams(
             chillZoneModuleDto.getServiceAddress(), ChillZoneParamModuleDto.class);
-    tabs.add(
-        "overview",
-        new OverviewTab(valueContainer, chillZoneModuleDto, chillZoneModuleParamsDto, webService)
-            .get());
+    overviewTab =
+        new OverviewTab(valueContainer, chillZoneModuleDto, chillZoneModuleParamsDto, webService);
+    tabs.add("overview", overviewTab.get());
 
     final VerticalLayout paramLayout = new ParamTab().get(chillZoneModuleParamsDto);
 

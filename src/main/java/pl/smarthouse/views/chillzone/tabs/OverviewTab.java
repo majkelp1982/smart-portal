@@ -4,7 +4,10 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import pl.smarthouse.components.*;
 import pl.smarthouse.service.WebService;
 import pl.smarthouse.sharedobjects.dto.chillzone.ChillZoneModuleDto;
@@ -16,11 +19,24 @@ import pl.smarthouse.views.utils.ColorPredicates;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
+@Slf4j
 public class OverviewTab {
   private final ValueContainer valueContainer;
   private final ChillZoneModuleDto chillZoneModuleDto;
   private final ChillZoneParamModuleDto chillZoneModuleParamsDto;
   private final WebService webService;
+  private String notification;
+
+  public void handleNotification() {
+    if (notification != null) {
+      Notification notificationRibbon = new Notification();
+      notificationRibbon.addThemeVariants(NotificationVariant.LUMO_ERROR);
+      notificationRibbon.setText(notification);
+      notificationRibbon.setDuration(5000);
+      notificationRibbon.open();
+      notification = null;
+    }
+  }
 
   public VerticalLayout get() {
     final VerticalLayout overviewTab = new VerticalLayout();
@@ -64,10 +80,7 @@ public class OverviewTab {
                       })
                   .onErrorResume(
                       throwable -> {
-                        Notification notification = new Notification();
-                        notification.setText(throwable.getMessage());
-                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                        notification.open();
+                        notification = throwable.getMessage();
                         return Mono.empty();
                       })
                   .subscribe();
