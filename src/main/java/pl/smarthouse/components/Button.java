@@ -1,11 +1,12 @@
 package pl.smarthouse.components;
 
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 public class Button extends PortalComponent {
-  private final HorizontalLayout layout = new HorizontalLayout();
+  @Getter private final HorizontalLayout layout = new HorizontalLayout();
   private final com.vaadin.flow.component.button.Button nameButton;
 
   public Button(final String name) {
@@ -23,13 +24,9 @@ public class Button extends PortalComponent {
     return nameButton;
   }
 
-  public HorizontalLayout getLayout() {
-    return layout;
-  }
-
   private void create() {
     // Component to keep the same handling of colors like in Info object
-    component = new com.vaadin.flow.component.html.Label();
+    component = new com.vaadin.flow.component.html.NativeLabel();
     layout.add(nameButton);
   }
 

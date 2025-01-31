@@ -5,7 +5,7 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -78,7 +78,7 @@ public class MainView extends AppLayout {
     // create elements
     final Image image = new Image(imageName, imageName);
     image.setHeight("50px");
-    final Label label = new Label(name);
+    final NativeLabel label = new NativeLabel(name);
 
     // add to horizontal layout
     element.add(image, label);

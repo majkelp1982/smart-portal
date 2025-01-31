@@ -17,7 +17,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.components.Info;
-import pl.smarthouse.components.Label;
+import pl.smarthouse.components.NativeLabel;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
 import pl.smarthouse.service.ParamsService;
@@ -111,7 +111,7 @@ public class ComfortView extends VerticalLayout {
 
   private Tile createZoneOverview(
       final String zoneName, final String valueContainerName, final ComfortModuleDto comfortDto) {
-    final Label zoneNameLabel = new Label(zoneName);
+    final NativeLabel zoneNameLabel = new NativeLabel(zoneName);
     ColorPredicates.assignToError(zoneNameLabel);
     final Tile tile = new Tile("room.svg", zoneNameLabel);
     final Info temperature = new Info("temperature", "°C");

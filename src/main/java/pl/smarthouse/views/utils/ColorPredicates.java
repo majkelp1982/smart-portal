@@ -6,7 +6,7 @@ import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import pl.smarthouse.components.Button;
 import pl.smarthouse.components.Info;
-import pl.smarthouse.components.Label;
+import pl.smarthouse.components.NativeLabel;
 import pl.smarthouse.components.PortalComponent;
 import pl.smarthouse.model.ComponentColor;
 import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRangeMode;
@@ -219,7 +219,7 @@ public class ColorPredicates {
     info.addColorPredicates(component -> (boolean) component.getValue(), ComponentColor.ALARM);
   }
 
-  public void assignToError(final Label label) {
+  public void assignToError(final NativeLabel label) {
     label.setColorEnabled(true);
     label.setDefaultColor(ComponentColor.NORMAL);
     label.addColorPredicates(component -> (boolean) component.getValue(), ComponentColor.ALARM);

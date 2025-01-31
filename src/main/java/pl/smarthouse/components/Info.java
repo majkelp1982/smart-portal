@@ -1,13 +1,14 @@
 package pl.smarthouse.components;
 
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import java.util.Objects;
+import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 public class Info extends PortalComponent {
-  private final HorizontalLayout layout = new HorizontalLayout();
+  @Getter private final HorizontalLayout layout = new HorizontalLayout();
   private final String name;
   private final String unit;
 
@@ -30,13 +31,9 @@ public class Info extends PortalComponent {
     create();
   }
 
-  public HorizontalLayout getLayout() {
-    return layout;
-  }
-
   private void create() {
-    component = new Label();
-    layout.add(new Label(name), component);
+    component = new NativeLabel();
+    layout.add(new NativeLabel(name), component);
   }
 
   @Override

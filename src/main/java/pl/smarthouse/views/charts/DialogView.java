@@ -3,7 +3,7 @@ package pl.smarthouse.views.charts;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -31,12 +31,13 @@ public class DialogView {
     final HorizontalLayout layout = createLayout(chartService.getMultiSelectListsMap());
 
     final Dialog manageDialog = new Dialog();
-    manageDialog.setHeight("600px");
+    manageDialog.setHeight("700px");
     manageDialog.setModal(true);
     manageDialog.setResizable(true);
     manageDialog.setDraggable(true);
     manageDialog.setCloseOnOutsideClick(true);
     manageDialog.setMinWidth("300px");
+    manageDialog.setMaxWidth("2000px");
     manageDialog.removeAll();
     manageDialog.add(layout);
 
@@ -68,7 +69,7 @@ public class DialogView {
   private VerticalLayout moduleLayout(
       final String moduleName, final MultiSelectListBox multiSelectListBox) {
     final VerticalLayout layout = new VerticalLayout();
-    final Label moduleNameLabel = new Label(moduleName);
+    final NativeLabel moduleNameLabel = new NativeLabel(moduleName);
     moduleNameLabel.getElement().getStyle().set("fontWeight", "bold");
     layout.add(moduleNameLabel);
     layout.add(multiSelectListBox);

@@ -22,19 +22,19 @@ public class OverviewTab {
 
     final HorizontalLayout firstLayer = new HorizontalLayout();
     firstLayer.add(statesTile());
-    firstLayer.add(Ds18b20Tile.getTile(new Label("chimney"), "chimney", valueContainer));
+    firstLayer.add(Ds18b20Tile.getTile(new NativeLabel("chimney"), "chimney", valueContainer));
 
     final HorizontalLayout secondLayer = new HorizontalLayout();
-    secondLayer.add(Ds18b20Tile.getTile(new Label("water in"), "waterIn", valueContainer));
+    secondLayer.add(Ds18b20Tile.getTile(new NativeLabel("water in"), "waterIn", valueContainer));
 
-    secondLayer.add(Ds18b20Tile.getTile(new Label("water out"), "waterOut", valueContainer));
+    secondLayer.add(Ds18b20Tile.getTile(new NativeLabel("water out"), "waterOut", valueContainer));
 
     overviewTab.add(firstLayer, secondLayer);
     return overviewTab;
   }
 
   private Tile statesTile() {
-    final Tile tile = new Tile("light-bulb.svg", new Label("State"));
+    final Tile tile = new Tile("light-bulb.svg", new NativeLabel("State"));
     final Info mode = new Info("mode");
     ColorPredicates.assignToMode(mode);
     final Info pump = new Info("pump");

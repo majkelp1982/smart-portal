@@ -2,7 +2,7 @@ package pl.smarthouse.views.chillzone.tabs;
 
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -43,7 +43,7 @@ public class ParamTab {
         event -> spaDeviceParam.setRequiredTemperature(requiredTemperatureField.getValue()));
 
     final IntegerField holdTimeField = new PercentageField("hold time");
-    holdTimeField.setSuffixComponent(new Label("minutes"));
+    holdTimeField.setSuffixComponent(new NativeLabel("minutes"));
     holdTimeField.setMin(5);
     holdTimeField.setMax(180);
     holdTimeField.setStep(5);

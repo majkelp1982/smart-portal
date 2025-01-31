@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import pl.smarthouse.components.Info;
-import pl.smarthouse.components.Label;
+import pl.smarthouse.components.NativeLabel;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
@@ -43,7 +43,7 @@ public class ZoneTab {
   }
 
   private Tile createZone(final ZoneName zoneName) {
-    final Label zoneNameLabel = new Label(zoneName.toString());
+    final NativeLabel zoneNameLabel = new NativeLabel(zoneName.toString());
     final Tile zoneTile = new Tile("place.svg", zoneNameLabel);
 
     final Info operation = new Info("operation");

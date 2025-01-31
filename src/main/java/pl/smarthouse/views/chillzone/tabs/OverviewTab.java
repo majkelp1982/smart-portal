@@ -56,7 +56,7 @@ public class OverviewTab {
       final String valueContainerName,
       final SpaDevice spaDevice,
       final SpaDeviceParam spaDeviceParam) {
-    final Label spaDeviceNameLabel = new Label(spaDeviceName);
+    final NativeLabel spaDeviceNameLabel = new NativeLabel(spaDeviceName);
     ColorPredicates.assignToError(spaDeviceNameLabel);
     final Tile tile = new Tile(valueContainerName + ".svg", spaDeviceNameLabel);
 

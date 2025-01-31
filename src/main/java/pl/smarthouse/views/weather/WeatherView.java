@@ -12,7 +12,7 @@ import com.vaadin.flow.router.Route;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.smarthouse.components.Info;
-import pl.smarthouse.components.Label;
+import pl.smarthouse.components.NativeLabel;
 import pl.smarthouse.components.Tile;
 import pl.smarthouse.components.ValueContainer;
 import pl.smarthouse.components.tiles.Bme280Tile;
@@ -57,7 +57,7 @@ public class WeatherView extends VerticalLayout {
   }
 
   private Tile airPollution() {
-    final Tile tile = new Tile("air.svg", new Label("Pollution"));
+    final Tile tile = new Tile("air.svg", new NativeLabel("Pollution"));
     final Info pm025 = new Info("PM2,5", "ug/m3");
     ColorPredicates.assignToValue(pm025, 50, 150);
     final Info pm10 = new Info("PM10", "ug/m3");
@@ -85,11 +85,11 @@ public class WeatherView extends VerticalLayout {
   }
 
   private Tile airTile() {
-    return Bme280Tile.getTile(new Label("Air"), "bme280Response", valueContainer);
+    return Bme280Tile.getTile(new NativeLabel("Air"), "bme280Response", valueContainer);
   }
 
   private Tile sunTile() {
-    final Tile tile = new Tile("sun.svg", new Label("Sun"));
+    final Tile tile = new Tile("sun.svg", new NativeLabel("Sun"));
     final Info sunRiseTimestamp = new Info("rise time");
     final Info sunSetTimestamp = new Info("set time");
     final Info sunState = new Info("state");

@@ -11,7 +11,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridSortOrder;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.SortDirection;
@@ -47,8 +47,8 @@ public class DiagnosticView extends VerticalLayout {
   private final ErrorHandlingService errorHandlingService;
   private final Grid<ErrorPredictionDiagnostic> errorsGrid = new Grid<>();
   private final Grid<ModuleDetails> moduleDetailsGrid = new Grid<>();
-  private final Label totalErrorCountLabel = new Label();
-  private final Label totalModuleDeatilsCountLabel = new Label();
+  private final NativeLabel totalErrorCountLabel = new NativeLabel();
+  private final NativeLabel totalModuleDetailsCountLabel = new NativeLabel();
   private final Set<ModuleDetails> modulesDetails = new HashSet<>();
 
   public DiagnosticView(
@@ -78,17 +78,17 @@ public class DiagnosticView extends VerticalLayout {
                                   moduleDetailsGrid.setItems(modulesDetails);
                                   moduleDetailsGrid.setHeightFull();
                                   moduleDetailsGrid.setAllRowsVisible(true);
-                                  totalModuleDeatilsCountLabel.getStyle().set("margin", "auto");
+                                  totalModuleDetailsCountLabel.getStyle().set("margin", "auto");
                                   if (modulesDetails.size() != diagnoseService.getModuleCount()) {
-                                    totalModuleDeatilsCountLabel
+                                    totalModuleDetailsCountLabel
                                         .getStyle()
                                         .set("color", ComponentColor.ALARM.value);
                                   } else {
-                                    totalModuleDeatilsCountLabel
+                                    totalModuleDetailsCountLabel
                                         .getStyle()
                                         .set("color", ComponentColor.OK.value);
                                   }
-                                  totalModuleDeatilsCountLabel.setText(
+                                  totalModuleDetailsCountLabel.setText(
                                       String.format(
                                           "Modules: %s/%s",
                                           modulesDetails.size(), diagnoseService.getModuleCount()));
@@ -269,7 +269,7 @@ public class DiagnosticView extends VerticalLayout {
               .forEach(diagnoseService::restartModule);
         });
 
-    layout.add(totalModuleDeatilsCountLabel, restartAllModulesButton);
+    layout.add(totalModuleDetailsCountLabel, restartAllModulesButton);
     return layout;
   }
 
