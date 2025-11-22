@@ -1,5 +1,14 @@
 /target/
-.idea/
+
+# IDE - IntelliJ IDEA / PyCharm
+# Ignore all .idea files except for shared configurations
+.idea/*
+!.idea/runConfigurations/
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+!.idea/vcs.xml
+!.idea/misc.xml
+
 .vscode/
 .settings
 .project
