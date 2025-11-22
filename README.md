@@ -31,6 +31,11 @@ Once the JAR file is built, you can run it using
 - `views` folder in `frontend/` contains the client-side JavaScript views of your application.
 - `themes` folder in `frontend/` contains the custom CSS styles.
 
+## AI Development Tools
+
+For developers interested in using AI models for Python programming assistance, see our comprehensive guide:
+- [Best AI Models for Python Programming](AI_MODELS_FOR_PYTHON.md) - A detailed comparison and recommendations for AI coding assistants
+
 ## Useful links
 
 - Read the documentation at [vaadin.com/docs](https://vaadin.com/docs).
