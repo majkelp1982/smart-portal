@@ -162,7 +162,8 @@ When choosing an AI model to act as an agent for programming Python projects, se
   - Self-hosted models (DeepSeek Coder, CodeLlama) for complete control
   - GitHub Copilot for Business with data exclusion policies
   - Review provider's Terms of Service regarding code ownership
-  - Understand data retention policies (e.g., OpenAI retains for 30 days, Anthropic doesn't train on API data)
+  - Understand data retention policies (e.g., as of November 2024: OpenAI retains for 30 days, Anthropic doesn't train on API data)
+  - Note: Data retention policies can change; always verify current terms
   - Never share credentials, API keys, or proprietary algorithms with cloud services
 - **Public/Open-source:** Any cloud-based model is generally acceptable
 - **Enterprise:** Enterprise versions with strict data retention policies and SLAs
@@ -201,17 +202,17 @@ When choosing an AI model to act as an agent for programming Python projects, se
 
 ## Benchmarks & Performance
 
-**Note:** The following scores are approximate and based on publicly available benchmark results from various sources (as of late 2024/early 2025). Model performance varies by task type and continues to improve with updates. Always test models with your specific use case.
+**Note:** The following scores are approximate and based on publicly available benchmark results from various sources (November 2024). Model performance varies by task type and continues to improve with updates. Always test models with your specific use case.
 
 Based on various coding benchmarks (HumanEval, MBPP, etc.):
 
-| Model | HumanEval Score* | Python Proficiency | Context Size |
-|-------|----------------|-------------------|--------------|
-| Claude 3.5 Sonnet | ~92% | Excellent | 200K tokens |
-| GPT-4 Turbo | ~88% | Excellent | 128K tokens |
-| GPT-4o | ~90% | Excellent | 128K tokens |
-| Gemini 1.5 Pro | ~84% | Very Good | 1M tokens |
-| DeepSeek Coder V2 | ~85% | Very Good | 16K tokens |
+| Model             | HumanEval Score* | Python Proficiency | Context Size |
+|-------------------|------------------|-------------------|--------------|
+| Claude 3.5 Sonnet | ~92%             | Excellent         | 200K tokens  |
+| GPT-4 Turbo       | ~88%             | Excellent         | 128K tokens  |
+| GPT-4o            | ~90%             | Excellent         | 128K tokens  |
+| Gemini 1.5 Pro    | ~84%             | Very Good         | 1M tokens    |
+| DeepSeek Coder V2 | ~85%             | Very Good         | 16K tokens   |
 
 *HumanEval is a benchmark of 164 programming problems. Scores are approximate and may vary based on evaluation methodology and model versions.
 
